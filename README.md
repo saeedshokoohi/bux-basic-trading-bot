@@ -2,7 +2,7 @@
 This project is a basic trading bot that is implemented for the BUX assignment.
 
 
-##  Requirements
+##  Features
 - Obtaining and retaining predefined trade information.
 - Connecting to the BUX server via WebSockets to track product price changes.
 - Execute a buy-order through the REST API service when the price is equal to or lower than the defined buy-price.
