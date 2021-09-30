@@ -29,3 +29,5 @@ TradeInfo entity is the main entity in the project which has following life-cycl
 In the diagram below, the following states and transitions are illustrated:
 
 
+
+![Trade State Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/75e017ed0edab8893878d3f2552b9a7c2d48ab4e/design/images/Trading%20State%20Diagram.jpg)
