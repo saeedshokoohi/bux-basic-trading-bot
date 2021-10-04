@@ -5,7 +5,6 @@ import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationExcepti
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -17,18 +16,25 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
 @Component
-public class BuxWebClient  {
+public class BuxWebClientFactory {
     final BrokersConfiguration brokersConfiguration;
     private  String baseUrl;
     private String accessToken;
+    private WebClient webClient;
 
-    public BuxWebClient(BrokersConfiguration brokersConfiguration) throws InvalidBrokerConfigurationException {
-        initFromConfiguration();
+    public BuxWebClientFactory(BrokersConfiguration brokersConfiguration) throws InvalidBrokerConfigurationException {
         this.brokersConfiguration = brokersConfiguration;
+
     }
 
-    @Bean
-    @Qualifier("buxWebClient")
+    public WebClient getWebClient() throws InvalidBrokerConfigurationException {
+        if(webClient==null)
+        {
+            initFromConfiguration();
+          webClient=buxWebClient();
+        }
+        return webClient;
+    }
     public WebClient buxWebClient() {
 
         var tcpClient = TcpClient.create()
@@ -54,8 +60,10 @@ public class BuxWebClient  {
         if(brokersConfiguration.getBux().getRest().getBaseUrl()==null)throw new InvalidBrokerConfigurationException("broker.bux.rest.baseUrl configuration not set");
         if(brokersConfiguration.getBux().getRest().getAccessToken()==null)throw new InvalidBrokerConfigurationException("broker.bux.rest.accessToken configuration not set");
         //setting variables
-        baseUrl=brokersConfiguration.getBux().getWebsocket().getBaseUrl();
-        accessToken=brokersConfiguration.getBux().getWebsocket().getAccessToken();
+        String version=brokersConfiguration.getBux().getRest().getVersion();
+        String env=brokersConfiguration.getBux().getRest().getEnv();
+        baseUrl=brokersConfiguration.getBux().getRest().getBaseUrl().replace("{env}",env).replace("{version}",version);
+        accessToken=brokersConfiguration.getBux().getRest().getAccessToken();
 
     }
 

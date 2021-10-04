@@ -19,15 +19,16 @@ public class BuxWebSocketClient {
 
     Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
     private BuxWebSocketHandler buxWebSocketHandler;
-    @Autowired
-    BrokersConfiguration brokersConfiguration;
+    final BrokersConfiguration brokersConfiguration;
     private  String baseUrl;
     private String channelUrl;
     private String accessToken;
 
-    public BuxWebSocketClient(BuxWebSocketHandler buxWebSocketHandler) throws InvalidBrokerConfigurationException {
+    public BuxWebSocketClient(BuxWebSocketHandler buxWebSocketHandler, BrokersConfiguration brokersConfiguration) throws InvalidBrokerConfigurationException {
         this.buxWebSocketHandler = buxWebSocketHandler;
+        this.brokersConfiguration = brokersConfiguration;
         initFromConfiguration();
+
     }
 
 
