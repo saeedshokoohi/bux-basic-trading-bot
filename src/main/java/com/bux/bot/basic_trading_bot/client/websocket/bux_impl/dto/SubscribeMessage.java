@@ -1,6 +1,7 @@
 package com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto;
 
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class SubscribeMessage {
     private String[] subscribeTo;
@@ -22,6 +23,10 @@ public class SubscribeMessage {
     }
     @Override
     public String toString() {
-       return JsonUtil.toJsonFormat(this);
+        try {
+            return JsonUtil.toJsonFormat(this);
+        } catch (JsonProcessingException e) {
+           return super.toString();
+        }
     }
 }

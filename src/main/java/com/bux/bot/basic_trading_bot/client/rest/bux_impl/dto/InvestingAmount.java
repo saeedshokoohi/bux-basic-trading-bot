@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvestingAmount{
-    public String currency;
-    public int decimals;
-    public String amount;
+    private String currency;
+    private int decimals;
+    private String amount;
 }

@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 @Data
 public class OpenPositionRequest {
 
-        public String productId;
-        public InvestingAmount investingAmount;
-        public int leverage;
-        public String direction;
-        public Source source=new Source("OTHER");
-        public String riskWarningConfirmation;
+        private String productId;
+    private InvestingAmount investingAmount;
+    private int leverage;
+    private String direction;
+    private Source source=new Source("OTHER");
+    private String riskWarningConfirmation;
 
 
     @Data
