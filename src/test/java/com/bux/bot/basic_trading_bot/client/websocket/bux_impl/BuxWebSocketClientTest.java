@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.client.impl.bux;
+package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import org.junit.jupiter.api.Test;

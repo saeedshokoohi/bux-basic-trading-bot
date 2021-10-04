@@ -1,5 +1,7 @@
-package com.bux.bot.basic_trading_bot.client.impl.bux.websocket;
+package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
+import com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto.BuxWebSocketInputMessage;
+import com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto.ConnectionStatus;
 import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.WebSocketEventBus;
@@ -15,8 +17,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.bux.bot.basic_trading_bot.client.impl.bux.websocket.ConnectionStatus.CLOSED;
-import static com.bux.bot.basic_trading_bot.client.impl.bux.websocket.ConnectionStatus.OPEN;
+import static com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto.ConnectionStatus.CLOSED;
+import static com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto.ConnectionStatus.OPEN;
 
 @Component
 public class BuxWebSocketHandler implements WebSocketHandler {

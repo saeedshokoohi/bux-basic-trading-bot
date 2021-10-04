@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.client.impl.bux.websocket;
+package com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto;
 
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 

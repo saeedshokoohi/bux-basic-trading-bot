@@ -1,8 +1,7 @@
-package com.bux.bot.basic_trading_bot.client.impl.bux;
+package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
-import com.bux.bot.basic_trading_bot.client.TrackerClientService;
-import com.bux.bot.basic_trading_bot.client.impl.bux.websocket.BuxWebSocketClient;
-import com.bux.bot.basic_trading_bot.client.impl.bux.websocket.SubscribeMessage;
+import com.bux.bot.basic_trading_bot.client.websocket.TrackerClientService;
+import com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto.SubscribeMessage;
 import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.WebSocketEventBus;
