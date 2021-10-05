@@ -20,13 +20,13 @@ public class BotOrderInfo {
     private String productId;
 
     @Column(nullable = false)
-    private BigDecimal buyPrice;
+    private Double buyPrice;
 
     @Column(nullable = false)
-    private BigDecimal upperSellPrice;
+    private Double upperSellPrice;
 
     @Column(nullable = false)
-    private BigDecimal lowerSellPrice;
+    private Double lowerSellPrice;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -38,7 +38,86 @@ public class BotOrderInfo {
     @Column(nullable = true)
     private String description;
 
+    public BotOrderInfo() {
+    }
 
+    public BotOrderInfo(String title, String productId, Double buyPrice, Double upperSellPrice, Double lowerSellPrice) {
+        this.title = title;
+        this.productId = productId;
+        this.buyPrice = buyPrice;
+        this.upperSellPrice = upperSellPrice;
+        this.lowerSellPrice = lowerSellPrice;
+    }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public Double getBuyPrice() {
+        return buyPrice;
+    }
+
+    public void setBuyPrice(Double buyPrice) {
+        this.buyPrice = buyPrice;
+    }
+
+    public Double getUpperSellPrice() {
+        return upperSellPrice;
+    }
+
+    public void setUpperSellPrice(Double upperSellPrice) {
+        this.upperSellPrice = upperSellPrice;
+    }
+
+    public Double getLowerSellPrice() {
+        return lowerSellPrice;
+    }
+
+    public void setLowerSellPrice(Double lowerSellPrice) {
+        this.lowerSellPrice = lowerSellPrice;
+    }
+
+    public BotOrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BotOrderStatus status) {
+        this.status = status;
+    }
+
+    public String getPositionId() {
+        return positionId;
+    }
+
+    public void setPositionId(String positionId) {
+        this.positionId = positionId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
