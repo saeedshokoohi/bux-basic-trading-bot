@@ -49,6 +49,18 @@ public class BotOrderInfo {
         this.lowerSellPrice = lowerSellPrice;
     }
 
+    public BotOrderInfo(Long id, String title, String productId, Double buyPrice, Double upperSellPrice, Double lowerSellPrice, BotOrderStatus status, String positionId, String description) {
+        this.id = id;
+        this.title = title;
+        this.productId = productId;
+        this.buyPrice = buyPrice;
+        this.upperSellPrice = upperSellPrice;
+        this.lowerSellPrice = lowerSellPrice;
+        this.status = status;
+        this.positionId = positionId;
+        this.description = description;
+    }
+
     public Long getId() {
         return id;
     }
