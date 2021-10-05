@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.client.websocket.bux_impl.dto;
+package com.bux.bot.basic_trading_bot.dto;
 
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;

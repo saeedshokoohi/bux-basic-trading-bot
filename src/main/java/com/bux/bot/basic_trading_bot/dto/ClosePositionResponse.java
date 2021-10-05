@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.client.rest.bux_impl.dto;
+package com.bux.bot.basic_trading_bot.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
