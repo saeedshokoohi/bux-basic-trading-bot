@@ -2,6 +2,7 @@ package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
 import com.bux.bot.basic_trading_bot.client.rest.TradeClientService;
 import com.bux.bot.basic_trading_bot.dto.*;
+import com.bux.bot.basic_trading_bot.dto.enums.PositionDirection;
 import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
 import com.bux.bot.basic_trading_bot.exception.WebClientApiCallException;
