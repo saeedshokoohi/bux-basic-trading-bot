@@ -14,6 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Optional;
+
 import static com.bux.bot.basic_trading_bot.service.ValidationMessages.UPPER_SELL_PRICE_MUST_BE_HIGHER_THAN_BUY_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,7 +36,7 @@ class BotOrderInfoServiceTest {
     BotOrderInfo botOrderInfo = new BotOrderInfo("newOrder", "ab23423k", 12.4, 14.1, 11.1);
     BotOrderInfo botOrderInfoResult = new BotOrderInfo("newOrder", "ab23423k", 12.4, 14.1, 11.1);
     when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-        .thenReturn(Mono.just(botOrderInfoResult));
+        .thenReturn(botOrderInfoResult);
 
     // when
     Mono<BotOrderInfo> result = this.botOrderInfoService.addNewBotOrderInfo(botOrderInfo);
@@ -57,8 +59,8 @@ class BotOrderInfoServiceTest {
         oldOrder.setId(id);
         newOrder.setId(id);
       when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-              .thenReturn(Mono.just(newOrder));
-      when(this.botOrderInfoRepository.findById(id)).thenReturn(Mono.just(oldOrder));
+              .thenReturn(newOrder);
+      when(this.botOrderInfoRepository.findById(id)).thenReturn(Optional.of(oldOrder));
     //when
       Mono<BotOrderInfo> result = this.botOrderInfoService.updateBotOrderInfo(newOrder);
     //then
@@ -80,8 +82,8 @@ class BotOrderInfoServiceTest {
         oldOrder.setId(id);
 
         when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-                .thenReturn(Mono.just(newOrder));
-        when(this.botOrderInfoRepository.findById(id)).thenReturn(Mono.just(oldOrder));
+                .thenReturn(newOrder);
+        when(this.botOrderInfoRepository.findById(id)).thenReturn(Optional.of(oldOrder));
         //when
         Mono<BotOrderInfo> result = this.botOrderInfoService.updateBotOrderInfo(newOrder);
         //then
@@ -100,8 +102,8 @@ class BotOrderInfoServiceTest {
 
 
         when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-                .thenReturn(Mono.just(newOrder));
-        when(this.botOrderInfoRepository.findById(invalidId)).thenReturn(Mono.empty());
+                .thenReturn(newOrder);
+        when(this.botOrderInfoRepository.findById(invalidId)).thenReturn(Optional.empty());
         //when
         Mono<BotOrderInfo> result = this.botOrderInfoService.updateBotOrderInfo(newOrder);
         //then
@@ -119,8 +121,8 @@ class BotOrderInfoServiceTest {
         newOrder.setId(id);
 
         when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-                .thenReturn(Mono.just(newOrder));
-        when(this.botOrderInfoRepository.findById(id)).thenReturn(Mono.just(oldOrder));
+                .thenReturn(newOrder);
+        when(this.botOrderInfoRepository.findById(id)).thenReturn(Optional.of(oldOrder));
         //when
         Mono<BotOrderInfo> result = this.botOrderInfoService.updateBotOrderInfo(newOrder);
         //then
@@ -144,8 +146,8 @@ class BotOrderInfoServiceTest {
         newOrder.setId(id);
 
         when(this.botOrderInfoRepository.save((BotOrderInfo) any()))
-                .thenReturn(Mono.just(newOrder));
-        when(this.botOrderInfoRepository.findById(id)).thenReturn(Mono.just(oldOrder));
+                .thenReturn(newOrder);
+        when(this.botOrderInfoRepository.findById(id)).thenReturn(Optional.of(oldOrder));
         //when
         Mono<BotOrderInfo> result = this.botOrderInfoService.updateBotOrderInfo(newOrder);
         //then
