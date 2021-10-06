@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface BotOrderInfoRepository extends CrudRepository<BotOrderInfo, Long> {
     List<BotOrderInfo> findByStatus(BotOrderStatus status);
-
+    List<BotOrderInfo> findByStatusIn(List<BotOrderStatus> statuses);
 }

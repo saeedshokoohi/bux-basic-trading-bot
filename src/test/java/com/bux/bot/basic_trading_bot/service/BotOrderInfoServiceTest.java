@@ -5,6 +5,7 @@ import com.bux.bot.basic_trading_bot.exception.ValidationError;
 import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
+import com.bux.bot.basic_trading_bot.service.constants.ValidationMessages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import reactor.test.StepVerifier;
 
 import java.util.Optional;
 
-import static com.bux.bot.basic_trading_bot.service.ValidationMessages.UPPER_SELL_PRICE_MUST_BE_HIGHER_THAN_BUY_PRICE;
+import static com.bux.bot.basic_trading_bot.service.constants.ValidationMessages.UPPER_SELL_PRICE_MUST_BE_HIGHER_THAN_BUY_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;

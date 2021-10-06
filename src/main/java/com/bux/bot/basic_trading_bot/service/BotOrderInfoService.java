@@ -4,9 +4,12 @@ import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
 import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
+import com.bux.bot.basic_trading_bot.service.constants.ValidationMessages;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus.*;
@@ -21,6 +24,9 @@ public class BotOrderInfoService {
     this.botOrderInfoRepository = botOrderInfoRepository;
   }
 
+  public Flux<BotOrderInfo> findByStatuses(List<BotOrderStatus> statuses){
+    return Flux.fromIterable(botOrderInfoRepository.findByStatusIn(statuses));
+  }
   public Mono<BotOrderInfo> addNewBotOrderInfo(BotOrderInfo botOrderInfo) {
     try {
       validateBotOrderInfo(botOrderInfo);

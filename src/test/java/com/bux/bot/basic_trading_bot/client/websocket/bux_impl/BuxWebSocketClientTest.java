@@ -16,16 +16,9 @@ class BuxWebSocketClientTest {
     @Test
     void contextLoads() throws InterruptedException {
     buxTrackerService
-        .subscribeOnProductPrice("sb26500")
-        .map(e -> {
-            try {
-                return JsonUtil.toJsonFormat(e);
-            } catch (JsonProcessingException ex) {
-                return e.toString();
-            }
-        }).log()
-        .subscribe();
-        buxTrackerService.subscribeOnProductPrice("sb26502").log().subscribe();
+        .monitorProductPrice("sb26500");
+
+        buxTrackerService.monitorProductPrice("sb26502");
         Thread.sleep(5000);
         buxTrackerService.connect().blockFirst();
       //  buxTrackerService.subscribeOnProductPrice("sb26493").log().subscribe();

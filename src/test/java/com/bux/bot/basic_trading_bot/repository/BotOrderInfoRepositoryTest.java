@@ -37,6 +37,25 @@ class BotOrderInfoRepositoryTest {
 
 
     }
+    @Test
+    void findByStatusIn() {
+        //given
+        List<BotOrderStatus> statusesToFind = new ArrayList<>();
+        statusesToFind.add(BotOrderStatus.OPEN);
+        statusesToFind.add(BotOrderStatus.ACTIVE);
+
+        List<BotOrderInfo> sampleData= getSampleData();
+        sampleData.forEach(this.entityManager::persist);
+        this.entityManager.flush();
+        //when
+        List<BotOrderInfo> actualResult = botOrderInfoRepository.findByStatusIn(statusesToFind);
+        //then
+        assertThat(actualResult).matches(elements -> elements.stream().allMatch(bo->{
+            return statusesToFind.contains(bo.getStatus());
+        }));
+
+
+    }
 
     private List<BotOrderInfo> getSampleData() {
         List<BotOrderInfo> sampleData=new ArrayList<>();

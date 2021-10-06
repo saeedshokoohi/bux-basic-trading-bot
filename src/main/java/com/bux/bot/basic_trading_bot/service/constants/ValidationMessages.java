@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.service;
+package com.bux.bot.basic_trading_bot.service.constants;
 
 public  final class ValidationMessages {
 
