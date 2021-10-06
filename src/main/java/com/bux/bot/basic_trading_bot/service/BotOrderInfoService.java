@@ -2,10 +2,14 @@ package com.bux.bot.basic_trading_bot.service;
 
 import com.bux.bot.basic_trading_bot.dto.ClosePositionResponse;
 import com.bux.bot.basic_trading_bot.dto.OpenPositionResponse;
-import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
 import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.OrderClosePosition;
+import com.bux.bot.basic_trading_bot.entity.OrderOpenPosition;
 import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
+import com.bux.bot.basic_trading_bot.repository.OrderClosePositionRepository;
+import com.bux.bot.basic_trading_bot.repository.OrderOpenPositionRepository;
 import com.bux.bot.basic_trading_bot.service.constants.ValidationMessages;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -21,14 +25,22 @@ public class BotOrderInfoService {
 
   public static final String ENTITY_NAME = "BotOrderInfo";
   final BotOrderInfoRepository botOrderInfoRepository;
+  final OrderOpenPositionRepository orderOpenPositionRepository;
+  final OrderClosePositionRepository orderClosePositionRepository;
 
-  public BotOrderInfoService(BotOrderInfoRepository botOrderInfoRepository) {
+  public BotOrderInfoService(
+      BotOrderInfoRepository botOrderInfoRepository,
+      OrderOpenPositionRepository orderOpenPositionRepository,
+      OrderClosePositionRepository orderClosePositionRepository) {
     this.botOrderInfoRepository = botOrderInfoRepository;
+    this.orderOpenPositionRepository = orderOpenPositionRepository;
+    this.orderClosePositionRepository = orderClosePositionRepository;
   }
 
-  public Flux<BotOrderInfo> findByStatuses(List<BotOrderStatus> statuses){
+  public Flux<BotOrderInfo> findByStatuses(List<BotOrderStatus> statuses) {
     return Flux.fromIterable(botOrderInfoRepository.findByStatusIn(statuses));
   }
+
   public Mono<BotOrderInfo> addNewBotOrderInfo(BotOrderInfo botOrderInfo) {
     try {
       validateBotOrderInfo(botOrderInfo);
@@ -38,13 +50,25 @@ public class BotOrderInfoService {
     botOrderInfo.setStatus(BotOrderStatus.ACTIVE);
     return Mono.just(botOrderInfoRepository.save(botOrderInfo));
   }
-  public void openPositionForOrder(BotOrderInfo botOrder, OpenPositionResponse position) {
+
+
+  public Mono<BotOrderInfo> openPositionForOrder(BotOrderInfo botOrder, OpenPositionResponse position) {
+    OrderOpenPosition orderOpenPosition = mapToOrderOpenPosition(position);
+    orderOpenPosition.setOrderId(botOrder.getId());
+    botOrder.setStatus(OPEN);
+    botOrder.setOpenPosition(orderOpenPosition);
+   return updateBotOrderInfo(botOrder);
+  }
+
+  public Mono<BotOrderInfo> closePositionForOrder(BotOrderInfo botOrder, ClosePositionResponse position) {
+    OrderClosePosition orderClosePosition = mapToOrderClosePosition(position);
+    orderClosePosition.setOrderId(botOrder.getId());
+    botOrder.setStatus(CLOSED);
+    botOrder.setClosePosition(orderClosePosition);
+    return updateBotOrderInfo(botOrder);
 
   }
 
-  public void closePositionForOrder(BotOrderInfo botOrder, ClosePositionResponse position) {
-
-  }
   public Mono<BotOrderInfo> updateBotOrderInfo(BotOrderInfo botOrderInfo) {
 
     try {
@@ -115,5 +139,58 @@ public class BotOrderInfoService {
     if (!exception.isValid()) throw exception;
   }
 
+  private OrderOpenPosition mapToOrderOpenPosition(OpenPositionResponse position) {
+    OrderOpenPosition retOrderOpenPosition = new OrderOpenPosition();
+    retOrderOpenPosition.setPositionId(position.getPositionId());
+    retOrderOpenPosition.setDirection(position.getDirection());
+    retOrderOpenPosition.setDateCreated(position.getDateCreated());
+    if (position.getInvestingAmount() != null) {
+      retOrderOpenPosition.setInvestingAmount(position.getInvestingAmount().getAmount());
+      retOrderOpenPosition.setInvestingAmountCurrency(position.getInvestingAmount().getCurrency());
+      retOrderOpenPosition.setInvestingAmountDecimals(position.getInvestingAmount().getDecimals());
+    }
+    retOrderOpenPosition.setClientId(position.getId());
+    retOrderOpenPosition.setLeverage(position.getLeverage());
+    if (position.getProduct() != null) {
+      retOrderOpenPosition.setProductDisplayName(position.getProduct().getDisplayName());
+      retOrderOpenPosition.setProductSecurityId(position.getProduct().getSecurityId());
+    }
+    if (position.getPrice() != null) {
+      retOrderOpenPosition.setType(position.getType());
+      retOrderOpenPosition.setPriceCurrency(position.getPrice().getCurrency());
+      retOrderOpenPosition.setPriceAmount(position.getPrice().getAmount());
+      retOrderOpenPosition.setPriceDecimals(position.getPrice().getDecimals());
+    }
+    return retOrderOpenPosition;
+  }
 
+  private OrderClosePosition mapToOrderClosePosition(ClosePositionResponse position) {
+    OrderClosePosition retOrderClosePosition = new OrderClosePosition();
+    retOrderClosePosition.setPositionId(position.getPositionId());
+    retOrderClosePosition.setDirection(position.getDirection());
+    retOrderClosePosition.setDateCreated(position.getDateCreated());
+    if (position.getInvestingAmount() != null) {
+      retOrderClosePosition.setInvestingAmount(position.getInvestingAmount().getAmount());
+      retOrderClosePosition.setInvestingAmountCurrency(position.getInvestingAmount().getCurrency());
+      retOrderClosePosition.setInvestingAmountDecimals(position.getInvestingAmount().getDecimals());
+    }
+    retOrderClosePosition.setClientId(position.getId());
+    retOrderClosePosition.setLeverage(position.getLeverage());
+    if (position.getProduct() != null) {
+      retOrderClosePosition.setProductDisplayName(position.getProduct().getDisplayName());
+      retOrderClosePosition.setProductSecurityId(position.getProduct().getSecurityId());
+    }
+    if (position.getPrice() != null) {
+      retOrderClosePosition.setType(position.getType());
+      retOrderClosePosition.setPriceCurrency(position.getPrice().getCurrency());
+      retOrderClosePosition.setPriceAmount(position.getPrice().getAmount());
+      retOrderClosePosition.setPriceDecimals(position.getPrice().getDecimals());
+    }
+    if (position.getProfitAndLoss() != null) {
+      retOrderClosePosition.setProfitAndLossAmount(position.getProfitAndLoss().getAmount());
+      retOrderClosePosition.setProfitAndLossCurrency(position.getProfitAndLoss().getCurrency());
+      retOrderClosePosition.setProfitAndLossDecimals(position.getProfitAndLoss().getDecimals());
+    }
+    return retOrderClosePosition;
+  }
 }

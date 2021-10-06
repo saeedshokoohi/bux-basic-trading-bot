@@ -102,7 +102,7 @@ public class BotEngineService {
         .closePosition(botOrder.getPositionId())
         .subscribe(
             position -> {
-              botOrderInfoService.closePositionForOrder(botOrder, position);
+              botOrderInfoService.closePositionForOrder(botOrder, position).block();
             });
   }
 
@@ -112,7 +112,7 @@ public class BotEngineService {
         .closePosition(botOrder.getPositionId())
         .subscribe(
             position -> {
-              botOrderInfoService.closePositionForOrder(botOrder, position);
+              botOrderInfoService.closePositionForOrder(botOrder, position).block();
             });
   }
 }
