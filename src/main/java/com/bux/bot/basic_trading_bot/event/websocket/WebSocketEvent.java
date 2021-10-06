@@ -1,7 +1,6 @@
-package com.bux.bot.basic_trading_bot.event;
+package com.bux.bot.basic_trading_bot.event.websocket;
 
 import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
-import com.bux.bot.basic_trading_bot.event.types.WebSocketStatusEventType;
 
 public class WebSocketEvent {
   private WebSocketStatusEventType event;

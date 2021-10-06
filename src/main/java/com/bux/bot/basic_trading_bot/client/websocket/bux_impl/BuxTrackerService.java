@@ -4,8 +4,8 @@ import com.bux.bot.basic_trading_bot.client.websocket.TrackerService;
 import com.bux.bot.basic_trading_bot.dto.ProductPrice;
 import com.bux.bot.basic_trading_bot.dto.SubscribeMessage;
 import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
-import com.bux.bot.basic_trading_bot.event.WebSocketEvent;
-import com.bux.bot.basic_trading_bot.event.WebSocketEventBus;
+import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEvent;
+import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.bux.bot.basic_trading_bot.event.types.WebSocketStatusEventType.CONNECTED;
-import static com.bux.bot.basic_trading_bot.event.types.WebSocketStatusEventType.DISCONNECTED;
+import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType.CONNECTED;
+import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType.DISCONNECTED;
 
 @Service
 public class BuxTrackerService implements TrackerService {
