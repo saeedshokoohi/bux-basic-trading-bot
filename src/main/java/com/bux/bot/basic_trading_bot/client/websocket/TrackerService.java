@@ -5,9 +5,11 @@ import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import reactor.core.publisher.Flux;
 
 public interface TrackerService {
-    Flux<WebSocketEventMessage> connect();
-    void monitorProductPrice(String productId);
-     Flux<ProductPrice> subscribeOnProductPrice(String productId);
-    Flux<ProductPrice> subscribeOnAllProductPrice();
+  Flux<WebSocketEventMessage> connect();
 
+  void monitorProductPrice(String productId);
+
+  Flux<ProductPrice> subscribeOnProductPrice(String productId);
+
+  Flux<ProductPrice> subscribeOnAllProductPrice();
 }

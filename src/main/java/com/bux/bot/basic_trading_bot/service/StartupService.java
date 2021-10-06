@@ -1,8 +1,11 @@
 package com.bux.bot.basic_trading_bot.service;
 
 import com.bux.bot.basic_trading_bot.client.websocket.TrackerService;
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
+import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
+import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -37,7 +40,15 @@ public class StartupService {
           trackerService
               .subscribeOnProductPrice(botOrder.getProductId())
               .subscribe(productPrice -> {
-                botEngineService.checkPrice(botOrder,productPrice);
+                  try {
+                      botEngineService.checkPrice(botOrder,productPrice);
+                  } catch (WebClientInitializationException e) {
+                      e.printStackTrace();
+                  } catch (InvalidBrokerConfigurationException e) {
+                      e.printStackTrace();
+                  } catch (InvalidBodyRequestException e) {
+                      e.printStackTrace();
+                  }
               });
         });
   }

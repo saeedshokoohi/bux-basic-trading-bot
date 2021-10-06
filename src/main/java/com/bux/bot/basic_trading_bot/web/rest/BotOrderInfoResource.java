@@ -1,9 +1,7 @@
 package com.bux.bot.basic_trading_bot.web.rest;
 
-import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.service.BotOrderInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

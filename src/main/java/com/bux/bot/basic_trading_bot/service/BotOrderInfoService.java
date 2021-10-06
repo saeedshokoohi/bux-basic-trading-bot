@@ -1,8 +1,10 @@
 package com.bux.bot.basic_trading_bot.service;
 
+import com.bux.bot.basic_trading_bot.dto.ClosePositionResponse;
+import com.bux.bot.basic_trading_bot.dto.OpenPositionResponse;
 import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
 import com.bux.bot.basic_trading_bot.service.constants.ValidationMessages;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 
-import static com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus.*;
+import static com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus.*;
 
 @Service
 public class BotOrderInfoService {
@@ -36,7 +38,13 @@ public class BotOrderInfoService {
     botOrderInfo.setStatus(BotOrderStatus.ACTIVE);
     return Mono.just(botOrderInfoRepository.save(botOrderInfo));
   }
+  public void openPositionForOrder(BotOrderInfo botOrder, OpenPositionResponse position) {
 
+  }
+
+  public void closePositionForOrder(BotOrderInfo botOrder, ClosePositionResponse position) {
+
+  }
   public Mono<BotOrderInfo> updateBotOrderInfo(BotOrderInfo botOrderInfo) {
 
     try {
@@ -48,7 +56,7 @@ public class BotOrderInfoService {
       return Mono.error(
           new EntityValidationException(ENTITY_NAME, ValidationMessages.ID_FIELD_IS_NULL));
     Optional<BotOrderInfo> oldBotOrderInfo = botOrderInfoRepository.findById(botOrderInfo.getId());
-    if (oldBotOrderInfo.isPresent())
+    if (!oldBotOrderInfo.isPresent())
       return Mono.error(
           new EntityValidationException(ENTITY_NAME, ValidationMessages.ID_IS_NOT_VALID));
     try {
@@ -106,4 +114,6 @@ public class BotOrderInfoService {
     // check if it is valid or not
     if (!exception.isValid()) throw exception;
   }
+
+
 }

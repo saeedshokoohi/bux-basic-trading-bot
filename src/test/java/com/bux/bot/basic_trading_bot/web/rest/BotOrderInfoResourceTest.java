@@ -1,8 +1,8 @@
 package com.bux.bot.basic_trading_bot.web.rest;
 
 import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 import com.bux.bot.basic_trading_bot.service.BotOrderInfoService;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BotOrderInfoResource.class)
@@ -36,7 +34,7 @@ class BotOrderInfoResourceTest {
     @Test
     void add_ok() throws Exception {
         //given
-        BotOrderInfo botOrderInfo = new BotOrderInfo(null,"oldOrder", "ab23423k", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1","");
+        BotOrderInfo botOrderInfo = new BotOrderInfo(null,"oldOrder", "ab23423k","1.0", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1","");
         when(this.botOrderInfoService.addNewBotOrderInfo(any()))
                 .thenReturn(Mono.just(botOrderInfo));
         //when
@@ -53,7 +51,7 @@ class BotOrderInfoResourceTest {
     @Test
     void add_error() throws Exception {
         //given
-        BotOrderInfo botOrderInfo = new BotOrderInfo(null,"oldOrder", "ab23423k", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1","");
+        BotOrderInfo botOrderInfo = new BotOrderInfo(null,"oldOrder", "ab23423k","1.0", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1","");
         when(this.botOrderInfoService.addNewBotOrderInfo(any()))
                 .thenReturn(Mono.error(new EntityValidationException("botOrder","ERROR in entity")));
         //when

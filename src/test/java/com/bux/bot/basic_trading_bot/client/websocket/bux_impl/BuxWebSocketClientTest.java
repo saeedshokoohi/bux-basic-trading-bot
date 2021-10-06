@@ -15,15 +15,15 @@ class BuxWebSocketClientTest {
 
     @Test
     void contextLoads() throws InterruptedException {
-    buxTrackerService
-        .monitorProductPrice("sb26500");
-
-        buxTrackerService.monitorProductPrice("sb26502");
-        Thread.sleep(5000);
-        buxTrackerService.connect().blockFirst();
-      //  buxTrackerService.subscribeOnProductPrice("sb26493").log().subscribe();
-
-            Thread.sleep(500000);
+//    buxTrackerService
+//        .monitorProductPrice("sb26500");
+//
+//        buxTrackerService.monitorProductPrice("sb26502");
+//        Thread.sleep(5000);
+//        buxTrackerService.connect().blockFirst();
+//      //  buxTrackerService.subscribeOnProductPrice("sb26493").log().subscribe();
+//
+//            Thread.sleep(500000);
 
     }
 

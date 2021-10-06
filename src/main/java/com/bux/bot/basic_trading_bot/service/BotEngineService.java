@@ -1,20 +1,27 @@
 package com.bux.bot.basic_trading_bot.service;
 
-import com.bux.bot.basic_trading_bot.client.rest.TradeClientService;
+import com.bux.bot.basic_trading_bot.client.rest.bux_impl.TradeService;
 import com.bux.bot.basic_trading_bot.dto.ProductPrice;
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
+import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
+import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BotEngineService {
-  final TradeClientService tradeClientService;
+  final TradeService tradeService;
+  final BotOrderInfoService botOrderInfoService;
 
-  public BotEngineService(TradeClientService tradeClientService) {
-    this.tradeClientService = tradeClientService;
+  public BotEngineService(TradeService tradeService, BotOrderInfoService botOrderInfoService) {
+    this.tradeService = tradeService;
+    this.botOrderInfoService = botOrderInfoService;
   }
 
-  public boolean checkPrice(BotOrderInfo botOrder, ProductPrice productPrice) {
+  public boolean checkPrice(BotOrderInfo botOrder, ProductPrice productPrice)
+      throws WebClientInitializationException, InvalidBrokerConfigurationException,
+          InvalidBodyRequestException {
     if (botOrder == null || productPrice == null) return false;
 
     BotOrderStatus currentOrderStatus = botOrder.getStatus();
@@ -27,7 +34,8 @@ public class BotEngineService {
     return false;
   }
 
-  private boolean checkPriceForOpenBotOrder(BotOrderInfo botOrder, ProductPrice productPrice) {
+  private boolean checkPriceForOpenBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
+      throws WebClientInitializationException, InvalidBrokerConfigurationException {
 
     Double upperSellPrice = botOrder.getUpperSellPrice();
     Double lowerSellPrice = botOrder.getLowerSellPrice();
@@ -48,7 +56,9 @@ public class BotEngineService {
     return false;
   }
 
-  private boolean checkPriceForActiveBotOrder(BotOrderInfo botOrder, ProductPrice productPrice) {
+  private boolean checkPriceForActiveBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
+      throws WebClientInitializationException, InvalidBodyRequestException,
+          InvalidBrokerConfigurationException {
     Double buyPrice = botOrder.getBuyPrice();
     Double currentPrice = null;
     try {
@@ -58,18 +68,51 @@ public class BotEngineService {
       return false;
     }
     if (buyPrice >= currentPrice) {
+
       openPosition(botOrder);
+
       return true;
     }
 
     return false;
   }
 
-  private void openPosition(BotOrderInfo botOrder) {
+  private void openPosition(BotOrderInfo botOrder)
+      throws WebClientInitializationException, InvalidBodyRequestException,
+          InvalidBrokerConfigurationException {
 
+    this.tradeService
+        .openLongPosition(
+            botOrder.getProductId(),
+            botOrder.getAmount(),
+            botOrder.getLeverage(),
+            botOrder.getDecimals(),
+            botOrder.getCurrency())
+        .subscribe(
+            position -> {
+              if (position != null) {
+                botOrderInfoService.openPositionForOrder(botOrder, position);
+              }
+            });
   }
 
-  private void closePositionWithLoss(BotOrderInfo botOrder) {}
+  private void closePositionWithLoss(BotOrderInfo botOrder)
+      throws WebClientInitializationException, InvalidBrokerConfigurationException {
+    this.tradeService
+        .closePosition(botOrder.getPositionId())
+        .subscribe(
+            position -> {
+              botOrderInfoService.closePositionForOrder(botOrder, position);
+            });
+  }
 
-  private void closePositionWithProfit(BotOrderInfo botOrder) {}
+  private void closePositionWithProfit(BotOrderInfo botOrder)
+      throws WebClientInitializationException, InvalidBrokerConfigurationException {
+    this.tradeService
+        .closePosition(botOrder.getPositionId())
+        .subscribe(
+            position -> {
+              botOrderInfoService.closePositionForOrder(botOrder, position);
+            });
+  }
 }

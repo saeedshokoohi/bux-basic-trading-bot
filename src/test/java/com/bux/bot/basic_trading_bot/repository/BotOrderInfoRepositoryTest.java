@@ -1,7 +1,7 @@
 package com.bux.bot.basic_trading_bot.repository;
 
-import com.bux.bot.basic_trading_bot.model.BotOrderInfo;
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +59,10 @@ class BotOrderInfoRepositoryTest {
 
     private List<BotOrderInfo> getSampleData() {
         List<BotOrderInfo> sampleData=new ArrayList<>();
-        sampleData.add(new BotOrderInfo(null,"oldOrder", "ab23423k", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1",""));
-        sampleData.add(new BotOrderInfo(null,"oldOrder2", "ab23423k", 12.4, 14.1, 11.1, BotOrderStatus.OPEN,"p2",""));
-        sampleData.add(new BotOrderInfo(null,"oldOrder3", "ab23423k", 12.4, 14.1, 11.1, BotOrderStatus.CLOSED,"p3",""));
-        sampleData.add(new BotOrderInfo(null,"oldOrder4", "23234", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p4",""));
+        sampleData.add(new BotOrderInfo(null,"oldOrder", "ab23423k","1.0", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p1",""));
+        sampleData.add(new BotOrderInfo(null,"oldOrder2", "ab23423k","1.0", 12.4, 14.1, 11.1, BotOrderStatus.OPEN,"p2",""));
+        sampleData.add(new BotOrderInfo(null,"oldOrder3", "ab23423k","1.0", 12.4, 14.1, 11.1, BotOrderStatus.CLOSED,"p3",""));
+        sampleData.add(new BotOrderInfo(null,"oldOrder4", "23234","1.0", 12.4, 14.1, 11.1, BotOrderStatus.ACTIVE,"p4",""));
         return sampleData;
     }
 }

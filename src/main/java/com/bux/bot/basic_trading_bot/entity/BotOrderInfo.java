@@ -1,9 +1,8 @@
-package com.bux.bot.basic_trading_bot.model;
+package com.bux.bot.basic_trading_bot.entity;
 
-import com.bux.bot.basic_trading_bot.model.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name="bot_order_info")
@@ -37,19 +36,39 @@ public class BotOrderInfo {
 
     @Column(nullable = true)
     private String description;
+    @Column(nullable = false)
+    private String amount;
+    @Column
+    private int leverage=2;
+    @Column
+    private int decimals=2;
+    @Column
+    private String currency="BUX";
+
+
+    @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    @JoinColumn(name = "openPositionId", referencedColumnName = "id")
+    private OrderOpenPosition openPosition;
+
+    @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    @JoinColumn(name = "closePositionId", referencedColumnName = "id")
+    private OrderClosePosition closePosition;
+
+
 
     public BotOrderInfo() {
     }
 
-    public BotOrderInfo(String title, String productId, Double buyPrice, Double upperSellPrice, Double lowerSellPrice) {
+    public BotOrderInfo(String title, String productId,String amount, Double buyPrice, Double upperSellPrice, Double lowerSellPrice) {
         this.title = title;
         this.productId = productId;
         this.buyPrice = buyPrice;
         this.upperSellPrice = upperSellPrice;
         this.lowerSellPrice = lowerSellPrice;
+        this.amount=amount;
     }
 
-    public BotOrderInfo(Long id, String title, String productId, Double buyPrice, Double upperSellPrice, Double lowerSellPrice, BotOrderStatus status, String positionId, String description) {
+    public BotOrderInfo(Long id, String title, String productId,String amount, Double buyPrice, Double upperSellPrice, Double lowerSellPrice, BotOrderStatus status, String positionId, String description) {
         this.id = id;
         this.title = title;
         this.productId = productId;
@@ -59,6 +78,7 @@ public class BotOrderInfo {
         this.status = status;
         this.positionId = positionId;
         this.description = description;
+        this.amount=amount;
     }
 
     public Long getId() {
@@ -132,4 +152,54 @@ public class BotOrderInfo {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public int getLeverage() {
+        return leverage;
+    }
+
+    public void setLeverage(int leverage) {
+        this.leverage = leverage;
+    }
+
+    public int getDecimals() {
+        return decimals;
+    }
+
+    public void setDecimals(int decimals) {
+        this.decimals = decimals;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public OrderOpenPosition getOpenPosition() {
+        return openPosition;
+    }
+
+    public void setOpenPosition(OrderOpenPosition openPosition) {
+        this.openPosition = openPosition;
+    }
+
+    public OrderClosePosition getClosePosition() {
+        return closePosition;
+    }
+
+    public void setClosePosition(OrderClosePosition closePosition) {
+        this.closePosition = closePosition;
+    }
+
+
 }

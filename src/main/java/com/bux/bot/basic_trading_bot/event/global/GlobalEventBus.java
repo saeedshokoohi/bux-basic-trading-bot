@@ -14,13 +14,13 @@ public class GlobalEventBus {
         observers=new HashSet<>();
     }
 
-    public boolean subscribe(@NotNull GlobalEventObserver observer) {
+    public <T> boolean subscribe(@NotNull GlobalEventObserver<T> observer) {
         return observers.add(new GlobalObserverTypeTuple(observer,null));
     }
-    public boolean subscribeOnEventType(@NotNull GlobalEventObserver observer,@NotNull GlobalEventType type) {
+    public <T> boolean subscribeOnEventType(@NotNull GlobalEventType type,@NotNull GlobalEventObserver<T> observer) {
         return observers.add(new GlobalObserverTypeTuple(observer,type));
     }
-    public void emit(GlobalEvent event) {
+    public <T> void emit(GlobalEvent<T> event) {
         observers.forEach(observerTuple -> {
             if(observerTuple.getType() == null || observerTuple.getType().equals(event.getType())) {
                 observerTuple.getObserver().next(event);

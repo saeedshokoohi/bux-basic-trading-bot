@@ -1,6 +1,6 @@
 package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
-import com.bux.bot.basic_trading_bot.client.rest.TradeClientService;
+
 import com.bux.bot.basic_trading_bot.dto.*;
 import com.bux.bot.basic_trading_bot.dto.enums.PositionDirection;
 import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Service
-public class BuxTradeService implements TradeClientService {
+public class BuxTradeService implements  TradeService {
   // injected fields
   final BuxWebClientFactory buxWebClientFactory;
 
@@ -39,12 +39,13 @@ public class BuxTradeService implements TradeClientService {
    * @throws WebClientInitializationException
    * @throws InvalidBrokerConfigurationException
    */
+  @Override
   public Mono<OpenPositionResponse> openLongPosition(
-      @NotNull String productId,
-      @NotNull String amount,
-      int leverage,
-      int decimals,
-      String currency)
+          @NotNull String productId,
+          @NotNull String amount,
+          int leverage,
+          int decimals,
+          String currency)
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
     if (buxWebClientFactory == null)
@@ -64,6 +65,7 @@ public class BuxTradeService implements TradeClientService {
         .bodyToMono(OpenPositionResponse.class);
   }
 
+  @Override
   public Mono<ClosePositionResponse> closePosition(@NotNull String positionId)
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
     if (buxWebClientFactory == null)
