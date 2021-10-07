@@ -30,7 +30,7 @@ public class StartupService {
     this.trackerService = trackerService;
     this.botEngineService = botEngineService;
       this.globalEventBus = globalEventBus;
-      if(scope)
+
     this.startTradingBot();
 
   }
