@@ -16,8 +16,8 @@ import java.net.URI;
 public class BuxWebSocketClient {
 
   Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
-  private BuxWebSocketHandler buxWebSocketHandler;
-  final BrokersConfiguration brokersConfiguration;
+  private final BuxWebSocketHandler buxWebSocketHandler;
+  private final BrokersConfiguration brokersConfiguration;
   private String baseUrl;
   private String channelUrl;
   private String accessToken;
@@ -30,9 +30,12 @@ public class BuxWebSocketClient {
     initFromConfiguration();
   }
 
+  /***
+   * making connection to websocket provider server
+   * @return
+   */
   public Mono<Void> getConnection() {
-    // String url="https://rtf.beta.getbux.com/subscriptions/me";
-    // String url="http://localhost:8080/subscriptions/me";
+
     String url = String.format("%s%s", baseUrl, channelUrl);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Accept-Language", "posnl-NL,en;q=0.8");
@@ -41,6 +44,10 @@ public class BuxWebSocketClient {
     return client.execute(URI.create(url), headers, buxWebSocketHandler);
   }
 
+  /***
+   * initializing connection config from properties
+   * @throws InvalidBrokerConfigurationException
+   */
   private void initFromConfiguration() throws InvalidBrokerConfigurationException {
     // handling exception
     if (brokersConfiguration == null)

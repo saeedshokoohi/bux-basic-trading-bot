@@ -5,6 +5,8 @@ import com.bux.bot.basic_trading_bot.exception.ValidationError;
 import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
+import com.bux.bot.basic_trading_bot.repository.OrderClosePositionRepository;
+import com.bux.bot.basic_trading_bot.repository.OrderOpenPositionRepository;
 import com.bux.bot.basic_trading_bot.service.constants.ValidationMessages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 class BotOrderInfoServiceTest {
   @MockBean private BotOrderInfoRepository botOrderInfoRepository;
+  @MockBean private OrderOpenPositionRepository orderOpenPositionRepository;
+  @MockBean private OrderClosePositionRepository orderClosePositionRepository;
 
   @Autowired private BotOrderInfoService botOrderInfoService;
 

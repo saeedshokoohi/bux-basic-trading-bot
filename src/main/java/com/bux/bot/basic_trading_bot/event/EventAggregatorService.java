@@ -19,28 +19,9 @@ public class EventAggregatorService {
     this.webSocketEventBus = webSocketEventBus;
 
     passEventsFromWebSocketEventBusToGlobalEventBus();
-    passEventsFromGlobalEventBusToWebSocketEventBus();
-
-
   }
 
-    /***
-     * This method observe on web socket related events and pass to the WebSocketEvent bus
-     */
-    private void passEventsFromGlobalEventBusToWebSocketEventBus() {
-        this.globalEventBus.subscribeOnEventType(GlobalEventType.WEBSOCKET_CONNECTION,e->{
-            if(e!=null && e.getPayload() instanceof WebSocketEvent)
-            this.webSocketEventBus.emitToConnection((WebSocketEvent) e.getPayload());
-        });
-        this.globalEventBus.subscribeOnEventType(GlobalEventType.WEBSOCKET_INPUT,e->{
-            if(e!=null && e.getPayload() instanceof WebSocketEvent)
-                this.webSocketEventBus.emitToInput((WebSocketEvent) e.getPayload());
-        });
-        this.globalEventBus.subscribeOnEventType(GlobalEventType.WEBSOCKET_OUTPUT,e->{
-            if(e!=null && e.getPayload() instanceof WebSocketEvent)
-                this.webSocketEventBus.emitToOutput((WebSocketEvent) e.getPayload());
-        });
-    }
+
 
     /***
      * this method subscribe on WebSocket Event bus and pass the emitted events to GlobalEvent bus

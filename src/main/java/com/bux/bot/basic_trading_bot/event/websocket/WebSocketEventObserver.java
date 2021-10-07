@@ -1,6 +1,7 @@
 package com.bux.bot.basic_trading_bot.event.websocket;
 
-public interface WebSocketEventObserver {
-    void next(WebSocketEvent event );
+import com.bux.bot.basic_trading_bot.event.base.GenericObserver;
+
+public interface WebSocketEventObserver extends GenericObserver<WebSocketEvent> {
 
 }
