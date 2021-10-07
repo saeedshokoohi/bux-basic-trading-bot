@@ -1,5 +1,6 @@
 package com.bux.bot.basic_trading_bot.exception;
 
+import com.bux.bot.basic_trading_bot.dto.ValidationMessage;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -13,6 +14,7 @@ public class EntityValidationException extends Throwable {
     private Set<ValidationError> errors;
     private String message;
     private boolean isValid=true;
+
 
     public EntityValidationException(String entityName) {
         this.entityName = entityName;
@@ -51,13 +53,18 @@ public class EntityValidationException extends Throwable {
     }
     public boolean isValid()
     {
-        return (isValid==true &&  (errors==null || errors.isEmpty()));
+        return (isValid &&  (errors==null || errors.isEmpty()));
+    }
+    public ValidationMessage getErrorMessage()
+    {
+        return new ValidationMessage(entityName,errors,message);
+
     }
     @Override
     public String toString() {
 
         try {
-            return JsonUtil.toJsonFormat(this);
+            return JsonUtil.toJsonFormat(getErrorMessage());
         } catch (JsonProcessingException e) {
             return super.toString();
         }

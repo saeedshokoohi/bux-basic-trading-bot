@@ -34,7 +34,7 @@ public class BotOrderInfo {
     @Column
     private String positionId;
 
-    @Column(nullable = true)
+    @Column
     private String description;
     @Column(nullable = false)
     private String amount;
@@ -44,6 +44,8 @@ public class BotOrderInfo {
     private int decimals=2;
     @Column
     private String currency="BUX";
+    @Transient
+    private boolean isProcessing=false;
 
 
     @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
@@ -201,5 +203,11 @@ public class BotOrderInfo {
         this.closePosition = closePosition;
     }
 
+    public boolean isProcessing() {
+        return isProcessing;
+    }
 
+    public void setProcessing(boolean processing) {
+        isProcessing = processing;
+    }
 }

@@ -1,10 +1,14 @@
 package com.bux.bot.basic_trading_bot.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonUtil {
+  private JsonUtil() {
+  }
+
   static ObjectMapper objectMapper = new ObjectMapper();
 
   public static String toJsonFormat(Object obj) throws JsonProcessingException {
@@ -23,12 +27,25 @@ public class JsonUtil {
     try {
       node = new ObjectMapper().readValue(jsonStr, ObjectNode.class);
       if (node.has(field)) {
-        retValueAsString = node.get("contentType").asText();
+        retValueAsString = node.get(field).asText();
       }
     } catch (JsonProcessingException e) {
       e.printStackTrace();
-      retValueAsString = null;
+
     }
     return retValueAsString;
+  }
+  public static JsonNode getFieldValueAsJsonNode(String jsonStr, String field) {
+    JsonNode node  = null;
+
+    try {
+      node = new ObjectMapper().readValue(jsonStr, ObjectNode.class);
+      if (node.has(field)) {
+        node = node.get(field);
+      }
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return node;
   }
 }

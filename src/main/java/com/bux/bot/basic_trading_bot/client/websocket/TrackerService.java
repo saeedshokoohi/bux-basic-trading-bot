@@ -12,4 +12,6 @@ public interface TrackerService {
   Flux<ProductPrice> subscribeOnProductPrice(String productId);
 
   Flux<ProductPrice> subscribeOnAllProductPrice();
+
+  void unsubscribeOnProductPrice(String productId);
 }

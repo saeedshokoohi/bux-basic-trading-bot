@@ -22,21 +22,23 @@ public class BotEngineService {
   public boolean checkPrice(BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
-    if (botOrder == null || productPrice == null) return false;
+    if (  botOrder == null || botOrder.isProcessing() || productPrice == null) return false;
 
     BotOrderStatus currentOrderStatus = botOrder.getStatus();
+    botOrder.setProcessing(true);
     switch (currentOrderStatus) {
       case ACTIVE:
         return checkPriceForActiveBotOrder(botOrder, productPrice);
       case OPEN:
         return checkPriceForOpenBotOrder(botOrder, productPrice);
     }
+
     return false;
   }
 
   private boolean checkPriceForOpenBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
-
+    boolean retValue=false;
     Double upperSellPrice = botOrder.getUpperSellPrice();
     Double lowerSellPrice = botOrder.getLowerSellPrice();
     Double currentPrice = null;
@@ -44,37 +46,39 @@ public class BotEngineService {
       currentPrice = Double.parseDouble(productPrice.getCurrentPrice());
     } catch (NumberFormatException e) {
       e.printStackTrace();
-      return false;
+      retValue= false;
     }
     if (upperSellPrice <= currentPrice) {
       closePositionWithProfit(botOrder);
-      return true;
+      retValue= true;
     } else if (lowerSellPrice >= currentPrice) {
       closePositionWithLoss(botOrder);
-      return true;
+      retValue= true;
     }
-    return false;
+    botOrder.setProcessing(false);
+    return retValue;
   }
 
   private boolean checkPriceForActiveBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBodyRequestException,
           InvalidBrokerConfigurationException {
+    boolean retValue=false;
     Double buyPrice = botOrder.getBuyPrice();
     Double currentPrice = null;
     try {
       currentPrice = Double.parseDouble(productPrice.getCurrentPrice());
     } catch (NumberFormatException ex) {
       ex.printStackTrace();
-      return false;
+      retValue= false;
     }
     if (buyPrice >= currentPrice) {
 
       openPosition(botOrder);
 
-      return true;
+      retValue= true;
     }
-
-    return false;
+    botOrder.setProcessing(false);
+    return retValue;
   }
 
   private void openPosition(BotOrderInfo botOrder)
@@ -91,7 +95,7 @@ public class BotEngineService {
         .subscribe(
             position -> {
               if (position != null) {
-                botOrderInfoService.openPositionForOrder(botOrder, position);
+                botOrderInfoService.openPositionForOrder(botOrder, position).block();
               }
             });
   }

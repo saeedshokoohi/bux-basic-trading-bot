@@ -6,6 +6,9 @@ import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.entity.OrderClosePosition;
 import com.bux.bot.basic_trading_bot.entity.OrderOpenPosition;
 import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
+import com.bux.bot.basic_trading_bot.event.global.GlobalEvent;
+import com.bux.bot.basic_trading_bot.event.global.GlobalEventBus;
+import com.bux.bot.basic_trading_bot.event.global.GlobalEventType;
 import com.bux.bot.basic_trading_bot.exception.EntityValidationException;
 import com.bux.bot.basic_trading_bot.repository.BotOrderInfoRepository;
 import com.bux.bot.basic_trading_bot.repository.OrderClosePositionRepository;
@@ -27,14 +30,17 @@ public class BotOrderInfoService {
   final BotOrderInfoRepository botOrderInfoRepository;
   final OrderOpenPositionRepository orderOpenPositionRepository;
   final OrderClosePositionRepository orderClosePositionRepository;
+  final GlobalEventBus globalEventBus;
 
   public BotOrderInfoService(
       BotOrderInfoRepository botOrderInfoRepository,
       OrderOpenPositionRepository orderOpenPositionRepository,
-      OrderClosePositionRepository orderClosePositionRepository) {
+      OrderClosePositionRepository orderClosePositionRepository,
+      GlobalEventBus globalEventBus) {
     this.botOrderInfoRepository = botOrderInfoRepository;
     this.orderOpenPositionRepository = orderOpenPositionRepository;
     this.orderClosePositionRepository = orderClosePositionRepository;
+    this.globalEventBus = globalEventBus;
   }
 
   public Flux<BotOrderInfo> findByStatuses(List<BotOrderStatus> statuses) {
@@ -48,25 +54,29 @@ public class BotOrderInfoService {
       return Mono.error(e);
     }
     botOrderInfo.setStatus(BotOrderStatus.ACTIVE);
-    return Mono.just(botOrderInfoRepository.save(botOrderInfo));
+    return Mono.just(botOrderInfoRepository.save(botOrderInfo)).doOnNext(botOrder -> {
+      globalEventBus.emit(new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_ADDED,this,botOrder));
+    });
   }
 
-
-  public Mono<BotOrderInfo> openPositionForOrder(BotOrderInfo botOrder, OpenPositionResponse position) {
+  public Mono<BotOrderInfo> openPositionForOrder(
+      BotOrderInfo botOrder, OpenPositionResponse position) {
     OrderOpenPosition orderOpenPosition = mapToOrderOpenPosition(position);
     orderOpenPosition.setOrderId(botOrder.getId());
     botOrder.setStatus(OPEN);
     botOrder.setOpenPosition(orderOpenPosition);
-   return updateBotOrderInfo(botOrder);
+    return updateBotOrderInfo(botOrder);
   }
 
-  public Mono<BotOrderInfo> closePositionForOrder(BotOrderInfo botOrder, ClosePositionResponse position) {
+  public Mono<BotOrderInfo> closePositionForOrder(
+      BotOrderInfo botOrder, ClosePositionResponse position) {
     OrderClosePosition orderClosePosition = mapToOrderClosePosition(position);
     orderClosePosition.setOrderId(botOrder.getId());
     botOrder.setStatus(CLOSED);
     botOrder.setClosePosition(orderClosePosition);
-    return updateBotOrderInfo(botOrder);
-
+    return updateBotOrderInfo(botOrder).doOnNext(botOrderInfo -> {
+      globalEventBus.emit(new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_CLOSED,this,botOrderInfo));
+    });
   }
 
   public Mono<BotOrderInfo> updateBotOrderInfo(BotOrderInfo botOrderInfo) {
@@ -100,6 +110,10 @@ public class BotOrderInfoService {
     }
     if (botOrderInfo.getBuyPrice() == null) {
       exception.addError("buyPrice", ValidationMessages.NULL_VALUE_IS_NOT_VALID);
+      throw exception;
+    }
+    if (botOrderInfo.getAmount() == null || botOrderInfo.getAmount().isEmpty()) {
+      exception.addError("amount", ValidationMessages.NULL_VALUE_IS_NOT_VALID);
       throw exception;
     }
     if (botOrderInfo.getUpperSellPrice() == null) {
@@ -139,7 +153,7 @@ public class BotOrderInfoService {
     if (!exception.isValid()) throw exception;
   }
 
-  private OrderOpenPosition mapToOrderOpenPosition(OpenPositionResponse position) {
+  public OrderOpenPosition mapToOrderOpenPosition(OpenPositionResponse position) {
     OrderOpenPosition retOrderOpenPosition = new OrderOpenPosition();
     retOrderOpenPosition.setPositionId(position.getPositionId());
     retOrderOpenPosition.setDirection(position.getDirection());
@@ -164,7 +178,7 @@ public class BotOrderInfoService {
     return retOrderOpenPosition;
   }
 
-  private OrderClosePosition mapToOrderClosePosition(ClosePositionResponse position) {
+  public OrderClosePosition mapToOrderClosePosition(ClosePositionResponse position) {
     OrderClosePosition retOrderClosePosition = new OrderClosePosition();
     retOrderClosePosition.setPositionId(position.getPositionId());
     retOrderClosePosition.setDirection(position.getDirection());

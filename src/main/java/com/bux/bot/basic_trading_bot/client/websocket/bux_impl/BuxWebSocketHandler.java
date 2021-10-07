@@ -70,12 +70,12 @@ public class BuxWebSocketHandler implements WebSocketHandler {
     try {
       WebsocketInputMessage buxMessage =
           JsonUtil.jsonToObject(payload, WebsocketInputMessage.class);
-      if (buxMessage.getT().equals("connect.connected")) {
+      if (buxMessage.getT().equals(Constants.CONNECT_CONNECTED)) {
 
         return WebSocketEvent.createConnectedEvent(websocketEventMessage);
       }
     } catch (JsonProcessingException e) {
-      e.printStackTrace();
+
     }
 
     return WebSocketEvent.createInputMessageEvent(websocketEventMessage);

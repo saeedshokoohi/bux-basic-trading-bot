@@ -1,14 +1,14 @@
 package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
-
-import com.bux.bot.basic_trading_bot.dto.*;
+import com.bux.bot.basic_trading_bot.dto.ClosePositionResponse;
+import com.bux.bot.basic_trading_bot.dto.InvestingAmount;
+import com.bux.bot.basic_trading_bot.dto.OpenPositionRequest;
+import com.bux.bot.basic_trading_bot.dto.OpenPositionResponse;
 import com.bux.bot.basic_trading_bot.dto.enums.PositionDirection;
 import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
 import com.bux.bot.basic_trading_bot.exception.WebClientApiCallException;
 import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
-import com.bux.bot.basic_trading_bot.util.JsonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Service
-public class BuxTradeService implements  TradeService {
+public class BuxTradeService implements TradeService {
   // injected fields
   final BuxWebClientFactory buxWebClientFactory;
 
@@ -41,11 +41,11 @@ public class BuxTradeService implements  TradeService {
    */
   @Override
   public Mono<OpenPositionResponse> openLongPosition(
-          @NotNull String productId,
-          @NotNull String amount,
-          int leverage,
-          int decimals,
-          String currency)
+      @NotNull String productId,
+      @NotNull String amount,
+      int leverage,
+      int decimals,
+      String currency)
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
     if (buxWebClientFactory == null)
@@ -103,16 +103,8 @@ public class BuxTradeService implements  TradeService {
    * @return
    */
   private Mono<? extends Throwable> handleError(ClientResponse response) {
-    String errorString = response.bodyToMono(String.class).block();
-    if (response.statusCode().is5xxServerError() || response.statusCode().is4xxClientError()) {
-      ErrorResponse responseBody = response.bodyToMono(ErrorResponse.class).block();
-      try {
-        errorString = JsonUtil.toJsonFormat(responseBody);
-      } catch (JsonProcessingException e) {
-        e.printStackTrace();
-      }
-    }
-    return Mono.error(new WebClientApiCallException(errorString));
+
+    return response.bodyToMono(String.class).map(msg -> new WebClientApiCallException(msg));
   }
 
   /**
