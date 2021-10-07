@@ -10,6 +10,7 @@ import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -25,6 +26,7 @@ import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEvent
 
 @Service
 public class BuxTrackerService implements TrackerService {
+
   ConcurrentMap<String,Integer> productSubscribeCount=new ConcurrentHashMap<>();
   List<WebSocketEvent> subscribedEvents = Collections.synchronizedList(new ArrayList<>());
   final BuxWebSocketClient buxWebSocketClient;

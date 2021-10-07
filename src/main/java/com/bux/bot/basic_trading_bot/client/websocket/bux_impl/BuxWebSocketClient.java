@@ -36,7 +36,9 @@ public class BuxWebSocketClient {
    */
   public Mono<Void> getConnection() {
 
+
     String url = String.format("%s%s", baseUrl, channelUrl);
+    logger.info("connecting to "+url);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Accept-Language", "posnl-NL,en;q=0.8");
     headers.add("Authorization", "Bearer " + accessToken);

@@ -9,7 +9,8 @@ spring:
     console:
       enabled: true
       path: /h2-ui
-
+app:
+  auto-start : false
 brokers:
   bux:
     websocket:
