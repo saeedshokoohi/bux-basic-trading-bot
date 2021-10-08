@@ -1,7 +1,6 @@
 package com.bux.bot.basic_trading_bot.service;
 
 import com.bux.bot.basic_trading_bot.client.rest.bux_impl.TradeService;
-import com.bux.bot.basic_trading_bot.client.websocket.bux_impl.BuxWebSocketClient;
 import com.bux.bot.basic_trading_bot.dto.ProductPrice;
 import com.bux.bot.basic_trading_bot.entity.BotOrderInfo;
 import com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus;
@@ -11,43 +10,64 @@ import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
 @Service
 public class BotEngineService {
-  Logger logger = LoggerFactory.getLogger(BotEngineService.class);
   final TradeService tradeService;
   final BotOrderInfoService botOrderInfoService;
+  Logger logger = LoggerFactory.getLogger(BotEngineService.class);
 
   public BotEngineService(TradeService tradeService, BotOrderInfoService botOrderInfoService) {
     this.tradeService = tradeService;
     this.botOrderInfoService = botOrderInfoService;
   }
 
-  public boolean checkPrice(BotOrderInfo botOrder, ProductPrice productPrice)
+  public Mono<BotOrderInfo> checkPrice(BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
 
-    if (  botOrder == null || botOrder.isProcessing() || productPrice == null) return false;
+    if (botOrder == null || botOrder.isProcessing() || productPrice == null) return Mono.empty();
     Optional<BotOrderInfo> currentBotOrder = botOrderInfoService.findById(botOrder.getId());
-    if(currentBotOrder.isPresent())botOrder=currentBotOrder.get();else return false;
-    BotOrderStatus currentOrderStatus = botOrder.getStatus();
-    logger.info("checking price for botOrder :"+botOrder.getId()+"for product:"+botOrder.getProductId());
+    BotOrderInfo attachedBotOrder = null;
+    if (currentBotOrder.isPresent()) attachedBotOrder = currentBotOrder.get();
+    else return Mono.empty();
+    BotOrderStatus currentOrderStatus = attachedBotOrder.getStatus();
+
+    boolean retValue = false;
     botOrder.setProcessing(true);
     switch (currentOrderStatus) {
       case ACTIVE:
-        return checkPriceForActiveBotOrder(botOrder, productPrice);
-      case OPEN:
-        return checkPriceForOpenBotOrder(botOrder, productPrice);
-    }
+        return checkPriceForActiveBotOrder(attachedBotOrder, productPrice).doOnError(e->{
+          botOrder.setProcessing(false);
+        }).doOnNext(e->{
+          botOrder.setProcessing(false);
+        });
 
-    return false;
+      case OPEN:
+        return checkPriceForOpenBotOrder(attachedBotOrder, productPrice)
+                .doOnError(e->{
+                  botOrder.setProcessing(false);
+                }).doOnNext(e->{
+                  botOrder.setProcessing(false);
+                });
+
+    }
+    botOrder.setProcessing(false);
+    return Mono.empty();
   }
 
-  private boolean checkPriceForOpenBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
+  private Mono<BotOrderInfo> checkPriceForOpenBotOrder(
+      BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
-    boolean retValue=false;
+    logger.info(
+        "checking price to CLOSE  POSITION for botOrder : "
+            + botOrder.getId()
+            + " on product: "
+            + botOrder.getProductId());
+
     Double upperSellPrice = botOrder.getUpperSellPrice();
     Double lowerSellPrice = botOrder.getLowerSellPrice();
     Double currentPrice = null;
@@ -55,79 +75,107 @@ public class BotEngineService {
       currentPrice = Double.parseDouble(productPrice.getCurrentPrice());
     } catch (NumberFormatException e) {
       e.printStackTrace();
-      retValue= false;
     }
     if (upperSellPrice <= currentPrice) {
-      closePositionWithProfit(botOrder);
-      retValue= true;
+     return closePositionWithProfit(botOrder);
     } else if (lowerSellPrice >= currentPrice) {
-      closePositionWithLoss(botOrder);
-      retValue= true;
+      return closePositionWithLoss(botOrder);
+    } else {
+      logger.info(
+          String.format(
+              "not good to sell! not currentPrice>= upperSellPrice :  %f ! > %f nor currentPrice<=lowerSellPrice : %f !<=%f ",
+              currentPrice, upperSellPrice, currentPrice, lowerSellPrice));
     }
-    botOrder.setProcessing(false);
-    return retValue;
+
+    return Mono.just(botOrder);
   }
 
-  private boolean checkPriceForActiveBotOrder(BotOrderInfo botOrder, ProductPrice productPrice)
+  private Mono<BotOrderInfo> checkPriceForActiveBotOrder(
+      BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBodyRequestException,
           InvalidBrokerConfigurationException {
-    boolean retValue=false;
+    logger.info(
+        String.format(
+            "checking price to OPEN a POSITION for botOrder : %d on product: %s",
+            botOrder.getId(), botOrder.getProductId()));
     Double buyPrice = botOrder.getBuyPrice();
     Double currentPrice = null;
     try {
       currentPrice = Double.parseDouble(productPrice.getCurrentPrice());
     } catch (NumberFormatException ex) {
       ex.printStackTrace();
-      retValue= false;
     }
     if (buyPrice >= currentPrice) {
-
-      openPosition(botOrder);
-
-      retValue= true;
+      return openPosition(botOrder);
+    } else {
+      logger.info(
+          String.format(
+              "not good to buy! currentPrice> buyPrice :  %f > %f", currentPrice, buyPrice));
     }
-    botOrder.setProcessing(false);
-    return retValue;
+    return Mono.just(botOrder);
   }
 
-  private void openPosition(BotOrderInfo botOrder)
+  private Mono<BotOrderInfo> openPosition(BotOrderInfo botOrder)
       throws WebClientInitializationException, InvalidBodyRequestException,
           InvalidBrokerConfigurationException {
-     logger.info("try to open position on product :"+botOrder.getProductId()+" for order:"+botOrder.getId());
-    this.tradeService
+    logger.info(
+        String.format(
+            "try to open position on product :%s for order:%d",
+            botOrder.getProductId(), botOrder.getId()));
+    return this.tradeService
         .openLongPosition(
             botOrder.getProductId(),
             botOrder.getAmount(),
             botOrder.getLeverage(),
             botOrder.getDecimals(),
             botOrder.getCurrency())
-        .subscribe(
+        .doOnNext(
             position -> {
-              if (position != null) {
-                botOrderInfoService.openPositionForOrder(botOrder, position).block();
-              }
-            });
+              logger.info(
+                  String.format(
+                      "Position Opened  ,positionId : %s , orderId : %s",
+                      position.getPositionId(), botOrder.getId()));
+            })
+        .flatMap(position -> botOrderInfoService.openPositionForOrder(botOrder, position))
+        .doOnNext(bo -> String.format("order updated on database orderId : %s", bo.getId()));
   }
 
-  private void closePositionWithLoss(BotOrderInfo botOrder)
+  private Mono<BotOrderInfo> closePositionWithLoss(BotOrderInfo botOrder)
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
-    logger.info("try to close position with loss on :"+botOrder.getPositionId() +"for order :"+botOrder.getId());
-    this.tradeService
+    logger.info(
+        String.format(
+            "try to close position with loss on :%sfor order :%d",
+            botOrder.getPositionId(), botOrder.getId()));
+    return this.tradeService
         .closePosition(botOrder.getPositionId())
-        .subscribe(
+        .doOnNext(
+            position -> {
+              logger.info(
+                  String.format(
+                      "Position closed with loss ,positionId : %s , orderId : %s",
+                      position.getPositionId(), botOrder.getId()));
+            })
+        .flatMap(position -> botOrderInfoService.closePositionForOrder(botOrder, position))
+        .doOnNext(bo -> String.format("order updated on database orderId : %s", bo.getId()));
+  }
+
+  private Mono<BotOrderInfo> closePositionWithProfit(BotOrderInfo botOrder)
+      throws WebClientInitializationException, InvalidBrokerConfigurationException {
+    logger.info(
+        "try to close position with profit on :"
+            + botOrder.getPositionId()
+            + "for order :"
+            + botOrder.getId());
+   return this.tradeService
+        .closePosition(botOrder.getPositionId())
+        .doOnNext(
             position ->
-              botOrderInfoService.closePositionForOrder(botOrder, position).block()
-            );
-  }
+                logger.info(
+                    String.format(
+                        "Position closed with profit ,positionId : %s , orderId : %s",
+                        position.getPositionId(), botOrder.getId())))
+        .flatMap(position -> botOrderInfoService.closePositionForOrder(botOrder, position))
+        .doOnNext(bo -> String.format("order updated on database orderId : %s", bo.getId()));
 
-  private void closePositionWithProfit(BotOrderInfo botOrder)
-      throws WebClientInitializationException, InvalidBrokerConfigurationException {
-    logger.info("try to close position with profit on :"+botOrder.getPositionId() +"for order :"+botOrder.getId());
-    this.tradeService
-        .closePosition(botOrder.getPositionId())
-        .subscribe(
-            position -> {
-              botOrderInfoService.closePositionForOrder(botOrder, position).block();
-            });
   }
 }

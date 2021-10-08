@@ -47,12 +47,13 @@ public class BotOrderInfo {
     @Transient
     private boolean isProcessing=false;
 
-
-    @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    //todo : fetch type must be lazy
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "openPositionId", referencedColumnName = "id")
     private OrderOpenPosition openPosition;
 
-    @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    //todo : fetch type must be lazy
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "closePositionId", referencedColumnName = "id")
     private OrderClosePosition closePosition;
 

@@ -88,6 +88,7 @@ public class BotOrderInfoService {
       BotOrderInfo botOrder, OpenPositionResponse position) {
     OrderOpenPosition orderOpenPosition = mapToOrderOpenPosition(position);
     orderOpenPosition.setOrderId(botOrder.getId());
+    botOrder.setPositionId(position.getPositionId());
     botOrder.setStatus(OPEN);
     botOrder.setOpenPosition(orderOpenPosition);
     return updateBotOrderInfo(botOrder);
@@ -137,6 +138,7 @@ public class BotOrderInfoService {
   public Mono<List<BotOrderInfo>> findAll() {
     return Mono.just(botOrderInfoRepository.findAll());
   }
+
 
   public Optional<BotOrderInfo> findById(Long id) {
     return botOrderInfoRepository.findById(id);

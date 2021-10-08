@@ -9,6 +9,7 @@ import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
 import com.bux.bot.basic_trading_bot.exception.WebClientApiCallException;
 import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -70,14 +71,18 @@ public class BuxTradeService implements TradeService {
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
     if (buxWebClientFactory == null)
       throw new WebClientInitializationException("buxWebClient could not be initialized");
-    String uri = "/users/me/trades/" + positionId;
+    String uri = "/users/me/portfolio/positions/" + positionId;
     return buxWebClientFactory
         .getWebClient()
-        .delete()
+            .method(HttpMethod.DELETE)
+
         .uri(uri)
-        .retrieve()
-        .onStatus(HttpStatus::isError, this::handleError)
-        .bodyToMono(ClosePositionResponse.class);
+        .exchange()
+            .flatMap(response -> {
+             return response.bodyToMono(ClosePositionResponse.class);
+            });
+//        .onStatus(HttpStatus::isError, this::handleError)
+
   }
   /***
    * validating validateOpenPositionRequest and return InvalidBodyRequestException with related error
