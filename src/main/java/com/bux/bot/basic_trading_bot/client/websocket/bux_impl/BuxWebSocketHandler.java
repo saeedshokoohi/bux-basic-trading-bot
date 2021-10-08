@@ -6,8 +6,11 @@ import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType;
+import com.bux.bot.basic_trading_bot.service.StartupService;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -22,7 +25,7 @@ import static com.bux.bot.basic_trading_bot.dto.enums.ConnectionStatus.OPEN;
 
 @Component
 public class BuxWebSocketHandler implements WebSocketHandler {
-
+  Logger logger = LoggerFactory.getLogger(StartupService.class);
   private WebSocketEventBus webSocketEventBus;
   private AtomicReference<ConnectionStatus>  status=new AtomicReference<>(CLOSED);
 
@@ -47,6 +50,7 @@ public class BuxWebSocketHandler implements WebSocketHandler {
             .map(
                 m -> {
                   WebSocketEvent event = createWebSocketEventFrom(m);
+                  logger.info(m.getPayloadAsText());
                   if (WebSocketStatusEventType.CONNECTED.equals(event.getEvent()) || WebSocketStatusEventType.DISCONNECTED.equals(event.getEvent())) {
                     status.set(WebSocketStatusEventType.CONNECTED.equals(event.getEvent()) ?OPEN:CLOSED);
                     webSocketEventBus.emitToConnection(event);

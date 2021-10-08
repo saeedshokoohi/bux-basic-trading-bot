@@ -7,9 +7,11 @@ import com.bux.bot.basic_trading_bot.dto.UnSubscribeMessage;
 import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
+import com.bux.bot.basic_trading_bot.service.StartupService;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -26,6 +28,7 @@ import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEvent
 
 @Service
 public class BuxTrackerService implements TrackerService {
+  Logger logger = LoggerFactory.getLogger(StartupService.class);
 
   ConcurrentMap<String,Integer> productSubscribeCount=new ConcurrentHashMap<>();
   List<WebSocketEvent> subscribedEvents = Collections.synchronizedList(new ArrayList<>());
@@ -62,6 +65,7 @@ public class BuxTrackerService implements TrackerService {
 
   @Override
   public void monitorProductPrice(String productId) {
+
     if(!productSubscribeCount.containsKey(productId) || productSubscribeCount.get(productId)==0)
     {
       WebSocketEventMessage message =
@@ -69,10 +73,12 @@ public class BuxTrackerService implements TrackerService {
                       new SubscribeMessage(Constants.TRADING_PRODUCT_PREFIX + productId).toString());
       WebSocketEvent event = WebSocketEvent.createOutputMessageEvent(message);
       emit(event);
+      logger.info("monitoring price for productId :"+productId);
     }
     if (productSubscribeCount.containsKey(productId)) {
       Integer count = productSubscribeCount.get(productId) + 1;
       productSubscribeCount.replace(productId,count);
+
 
     }else {
       productSubscribeCount.put(productId, 1);
@@ -80,7 +86,9 @@ public class BuxTrackerService implements TrackerService {
   }
 
   public Flux<ProductPrice> subscribeOnProductPrice(String productId) {
-    return subscribeOnAllProductPrice()
+    return subscribeOnAllProductPrice().doOnNext(price->{
+      logger.info("price update for product id:"+productId+"->"+price.getCurrentPrice());
+    })
         .filter(productPrice -> productPrice.getSecurityId().equals(productId));
   }
 
@@ -107,6 +115,7 @@ public class BuxTrackerService implements TrackerService {
       }
     }
     if (count == 0) {
+      logger.info("unsubscribing on product :"+ productId);
       WebSocketEventMessage message =
           new WebSocketEventMessage(
               new UnSubscribeMessage(Constants.TRADING_PRODUCT_PREFIX + productId).toString());
@@ -132,6 +141,7 @@ public class BuxTrackerService implements TrackerService {
   }
 
   private void reconnect() {
+    logger.info("reconnecting to web socket server.....");
     this.connect();
   }
 

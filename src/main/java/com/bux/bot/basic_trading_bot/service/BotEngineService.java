@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BotEngineService {
   Logger logger = LoggerFactory.getLogger(BotEngineService.class);
@@ -26,8 +28,10 @@ public class BotEngineService {
   public boolean checkPrice(BotOrderInfo botOrder, ProductPrice productPrice)
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
-    if (  botOrder == null || botOrder.isProcessing() || productPrice == null) return false;
 
+    if (  botOrder == null || botOrder.isProcessing() || productPrice == null) return false;
+    Optional<BotOrderInfo> currentBotOrder = botOrderInfoService.findById(botOrder.getId());
+    if(currentBotOrder.isPresent())botOrder=currentBotOrder.get();else return false;
     BotOrderStatus currentOrderStatus = botOrder.getStatus();
     logger.info("checking price for botOrder :"+botOrder.getId()+"for product:"+botOrder.getProductId());
     botOrder.setProcessing(true);

@@ -44,7 +44,29 @@ public class BotOrderInfoService {
   }
 
   public Flux<BotOrderInfo> findByStatuses(List<BotOrderStatus> statuses) {
-    return Flux.fromIterable(botOrderInfoRepository.findByStatusIn(statuses));
+
+    return Flux.create(
+        emitter -> {
+          // passing available botOrders from database
+          List<BotOrderInfo> currentOrders = botOrderInfoRepository.findByStatusIn(statuses);
+          currentOrders.forEach(
+              botOrderInfo -> {
+                emitter.next(botOrderInfo);
+              });
+          // checking if any new bot order is adding
+          // if any order added it will emit to consumer
+          globalEventBus.subscribeOnEventType(
+              GlobalEventType.BOTORDER_ADDED,
+              event -> {
+                if (event.getPayload() instanceof BotOrderInfo) {
+                  BotOrderInfo botOrder = (BotOrderInfo) event.getPayload();
+                  // checking if added order has the condition statuses
+                  if (statuses.contains(botOrder.getStatus())) {
+                    emitter.next(botOrder);
+                  }
+                }
+              });
+        });
   }
 
   public Mono<BotOrderInfo> addNewBotOrderInfo(BotOrderInfo botOrderInfo) {
@@ -54,9 +76,12 @@ public class BotOrderInfoService {
       return Mono.error(e);
     }
     botOrderInfo.setStatus(BotOrderStatus.ACTIVE);
-    return Mono.just(botOrderInfoRepository.save(botOrderInfo)).doOnNext(botOrder -> {
-      globalEventBus.emit(new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_ADDED,this,botOrder));
-    });
+    return Mono.just(botOrderInfoRepository.save(botOrderInfo))
+        .doOnNext(
+            botOrder -> {
+              globalEventBus.emit(
+                  new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_ADDED, this, botOrder));
+            });
   }
 
   public Mono<BotOrderInfo> openPositionForOrder(
@@ -74,9 +99,13 @@ public class BotOrderInfoService {
     orderClosePosition.setOrderId(botOrder.getId());
     botOrder.setStatus(CLOSED);
     botOrder.setClosePosition(orderClosePosition);
-    return updateBotOrderInfo(botOrder).doOnNext(botOrderInfo -> {
-      globalEventBus.emit(new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_CLOSED,this,botOrderInfo));
-    });
+    return updateBotOrderInfo(botOrder)
+        .doOnNext(
+            botOrderInfo -> {
+              globalEventBus.emit(
+                  new GlobalEvent<BotOrderInfo>(
+                      GlobalEventType.BOTORDER_CLOSED, this, botOrderInfo));
+            });
   }
 
   public Mono<BotOrderInfo> updateBotOrderInfo(BotOrderInfo botOrderInfo) {
@@ -99,6 +128,43 @@ public class BotOrderInfoService {
       return Mono.error(e);
     }
     return Mono.just(botOrderInfoRepository.save(botOrderInfo));
+  }
+
+  /***
+   * returning all available records
+   * @return
+   */
+  public Mono<List<BotOrderInfo>> findAll() {
+    return Mono.just(botOrderInfoRepository.findAll());
+  }
+
+  public Optional<BotOrderInfo> findById(Long id) {
+    return botOrderInfoRepository.findById(id);
+  }
+  public Mono<Boolean> deleteBotOrderById(Long id)
+  {
+    Optional<BotOrderInfo> botOrderToDelete = botOrderInfoRepository.findById(id);
+    if(botOrderToDelete.isPresent())
+    {
+      botOrderInfoRepository.delete(botOrderToDelete.get());
+      globalEventBus.emit(new GlobalEvent<BotOrderInfo>(GlobalEventType.BOTORDER_REMOVED,this,botOrderToDelete.get()));
+     return Mono.just(true);
+    }else {
+      return Mono.just(false);
+    }
+
+  }
+  /***
+   * deleting all records
+   * @return number of deleted records
+   */
+  public Mono<Long> clear() {
+    long count = botOrderInfoRepository.count();
+    List<BotOrderInfo> allrecords = botOrderInfoRepository.findAll();
+    allrecords.forEach(botOrderInfo -> {
+      deleteBotOrderById(botOrderInfo.getId()).block();
+    });
+    return Mono.just(count);
   }
 
   public void validateBotOrderInfo(BotOrderInfo botOrderInfo) throws EntityValidationException {
@@ -207,4 +273,6 @@ public class BotOrderInfoService {
     }
     return retOrderClosePosition;
   }
+
+
 }
