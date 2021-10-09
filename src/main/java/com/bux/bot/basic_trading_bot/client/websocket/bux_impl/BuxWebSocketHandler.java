@@ -61,6 +61,11 @@ public class BuxWebSocketHandler implements WebSocketHandler {
                   }
                   return m;
                 })
+                .doOnError(e->{
+                    status.set(CLOSED);
+                    webSocketEventBus.emitToConnection(
+                            WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
+                })
             .doOnTerminate(
                 () -> {
                   status.set(CLOSED);

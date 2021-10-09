@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({BrokersConfiguration.class, ApplicationConfiguration.class})
 public class BasicTradingBotApplication {
-    //start point of app
 
 	public static void main(String[] args) {
 		SpringApplication.run(BasicTradingBotApplication.class, args);

@@ -143,8 +143,15 @@ public class BuxTrackerService implements TrackerService {
     return productPrice;
   }
 
-  private void reconnect() {
+  public void reconnect() {
     logger.info("reconnecting to web socket server.....");
+    //todo: checking some policies for reconnecting
+    //todo : temporary we wait for some miliseconds and will try again
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     this.connect();
   }
 
