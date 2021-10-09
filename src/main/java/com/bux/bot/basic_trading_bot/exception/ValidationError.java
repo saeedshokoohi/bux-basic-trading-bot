@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
-public class ValidationError {
+public class ValidationError implements Serializable {
     private String field;
     private String userError;
     private String developerError;

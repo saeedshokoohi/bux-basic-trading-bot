@@ -2,6 +2,7 @@ package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
 import com.bux.bot.basic_trading_bot.config.BrokersConfiguration;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
+import com.bux.bot.basic_trading_bot.exception.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -15,9 +16,10 @@ import java.net.URI;
 @Service
 public class BuxWebSocketClient {
 
-  Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
+
   private final BuxWebSocketHandler buxWebSocketHandler;
   private final BrokersConfiguration brokersConfiguration;
+  Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
   private String baseUrl;
   private String channelUrl;
   private String accessToken;
@@ -36,9 +38,8 @@ public class BuxWebSocketClient {
    */
   public Mono<Void> getConnection() {
 
-
     String url = String.format("%s%s", baseUrl, channelUrl);
-    logger.info("connecting to "+url);
+    logger.info("connecting to " + url);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Accept-Language", "posnl-NL,en;q=0.8");
     headers.add("Authorization", "Bearer " + accessToken);
@@ -53,20 +54,21 @@ public class BuxWebSocketClient {
   private void initFromConfiguration() throws InvalidBrokerConfigurationException {
     // handling exception
     if (brokersConfiguration == null)
-      throw new InvalidBrokerConfigurationException("broker configuration not set");
+      throw new InvalidBrokerConfigurationException(Messages.BROKER_CONFIGURATION_NOT_SET);
     if (brokersConfiguration.getBux() == null)
-      throw new InvalidBrokerConfigurationException("broker.bux configuration not set");
+      throw new InvalidBrokerConfigurationException(Messages.BROKER_BUX_CONFIGURATION_NOT_SET);
     if (brokersConfiguration.getBux().getWebsocket() == null)
-      throw new InvalidBrokerConfigurationException("broker.bux.websocket configuration not set");
+      throw new InvalidBrokerConfigurationException(
+          Messages.BROKER_BUX_WEBSOCKET_CONFIGURATION_NOT_SET);
     if (brokersConfiguration.getBux().getWebsocket().getBaseUrl() == null)
       throw new InvalidBrokerConfigurationException(
-          "broker.bux.websocket.baseUrl configuration not set");
+          Messages.BROKER_BUX_WEBSOCKET_BASE_URL_CONFIGURATION_NOT_SET);
     if (brokersConfiguration.getBux().getWebsocket().getChannelUrl() == null)
       throw new InvalidBrokerConfigurationException(
-          "broker.bux.websocket.channelUrl configuration not set");
+          Messages.BROKER_BUX_WEBSOCKET_CHANNEL_URL_CONFIGURATION_NOT_SET);
     if (brokersConfiguration.getBux().getWebsocket().getAccessToken() == null)
       throw new InvalidBrokerConfigurationException(
-          "broker.bux.websocket.accessToken configuration not set");
+          Messages.BROKER_BUX_WEBSOCKET_ACCESS_TOKEN_CONFIGURATION_NOT_SET);
     // setting variables
     baseUrl = brokersConfiguration.getBux().getWebsocket().getBaseUrl();
     channelUrl = brokersConfiguration.getBux().getWebsocket().getChannelUrl();

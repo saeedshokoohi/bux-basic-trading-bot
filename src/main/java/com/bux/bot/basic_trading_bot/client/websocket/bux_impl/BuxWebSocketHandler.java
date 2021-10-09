@@ -1,12 +1,11 @@
 package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
+import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.dto.WebsocketInputMessage;
 import com.bux.bot.basic_trading_bot.dto.enums.ConnectionStatus;
-import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType;
-import com.bux.bot.basic_trading_bot.service.StartupService;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
@@ -25,13 +24,12 @@ import static com.bux.bot.basic_trading_bot.dto.enums.ConnectionStatus.OPEN;
 
 @Component
 public class BuxWebSocketHandler implements WebSocketHandler {
-  Logger logger = LoggerFactory.getLogger(StartupService.class);
+  Logger logger = LoggerFactory.getLogger(BuxWebSocketHandler.class);
   private WebSocketEventBus webSocketEventBus;
-  private AtomicReference<ConnectionStatus>  status=new AtomicReference<>(CLOSED);
+  private AtomicReference<ConnectionStatus> status = new AtomicReference<>(CLOSED);
 
   public BuxWebSocketHandler(WebSocketEventBus webSocketEventBus) {
     this.webSocketEventBus = webSocketEventBus;
-    subscribeOnInitialEvents();
 
   }
 
@@ -51,8 +49,12 @@ public class BuxWebSocketHandler implements WebSocketHandler {
                 m -> {
                   WebSocketEvent event = createWebSocketEventFrom(m);
                   logger.info(m.getPayloadAsText());
-                  if (WebSocketStatusEventType.CONNECTED.equals(event.getEvent()) || WebSocketStatusEventType.DISCONNECTED.equals(event.getEvent())) {
-                    status.set(WebSocketStatusEventType.CONNECTED.equals(event.getEvent()) ?OPEN:CLOSED);
+                  if (WebSocketStatusEventType.CONNECTED.equals(event.getEvent())
+                      || WebSocketStatusEventType.DISCONNECTED.equals(event.getEvent())) {
+                    status.set(
+                        WebSocketStatusEventType.CONNECTED.equals(event.getEvent())
+                            ? OPEN
+                            : CLOSED);
                     webSocketEventBus.emitToConnection(event);
                   } else {
                     webSocketEventBus.emitToInput(event);
@@ -60,10 +62,11 @@ public class BuxWebSocketHandler implements WebSocketHandler {
                   return m;
                 })
             .doOnTerminate(
-                () ->{
+                () -> {
                   status.set(CLOSED);
-                    webSocketEventBus.emitToConnection(
-                        WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));});
+                  webSocketEventBus.emitToConnection(
+                      WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
+                });
     return session.send(outMessages).mergeWith(receiving.then()).then();
   }
 
@@ -79,7 +82,7 @@ public class BuxWebSocketHandler implements WebSocketHandler {
         return WebSocketEvent.createConnectedEvent(websocketEventMessage);
       }
     } catch (JsonProcessingException e) {
-
+        //
     }
 
     return WebSocketEvent.createInputMessageEvent(websocketEventMessage);
@@ -96,15 +99,14 @@ public class BuxWebSocketHandler implements WebSocketHandler {
                   // listening on event handler
                   // if it is output Message send to outPutEventStream
                   // for sending to webSocketMessage
-                  if (WebSocketStatusEventType.OUT_MESSAGE.equals(event.getEvent()))
-                    if (OPEN.equals(status.get())) {
-                      event.setEmitted(true);
-                      emitter.next(event);
-                    }
+                  if (!WebSocketStatusEventType.OUT_MESSAGE.equals(event.getEvent())) {
+                    return;
+                  }
+                  if (OPEN.equals(status.get())) {
+                    event.setEmitted(true);
+                    emitter.next(event);
+                  }
                 }));
-  }
-  private void subscribeOnInitialEvents() {
-
   }
 
 }

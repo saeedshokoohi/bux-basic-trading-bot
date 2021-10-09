@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,11 +30,13 @@ import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEvent
 @Service
 public class BuxTrackerService implements TrackerService {
   Logger logger = LoggerFactory.getLogger(StartupService.class);
+  private final BuxWebSocketClient buxWebSocketClient;
+  private final WebSocketEventBus webSocketEventBus;
 
-  ConcurrentMap<String,Integer> productSubscribeCount=new ConcurrentHashMap<>();
-  List<WebSocketEvent> subscribedEvents = Collections.synchronizedList(new ArrayList<>());
-  final BuxWebSocketClient buxWebSocketClient;
-  final WebSocketEventBus webSocketEventBus;
+  //
+  private ConcurrentMap<String,Integer> productSubscribeCount=new ConcurrentHashMap<>();
+  private List<WebSocketEvent> subscribedEvents = Collections.synchronizedList(new ArrayList<>());
+
 
   public BuxTrackerService(
       WebSocketEventBus webSocketEventBus, BuxWebSocketClient buxWebSocketClient) {
@@ -43,21 +46,21 @@ public class BuxTrackerService implements TrackerService {
   }
 
   @Override
-  public Flux<WebSocketEventMessage> connect() {
+  public Mono<Boolean> connect() {
     buxWebSocketClient
         .getConnection()
         .doOnError(
             e -> {
-              System.out.println(e);
-
+             logger.error("web socket connection error",e);
               reconnect();
             })
         .subscribe();
-    return Flux.create(
+
+    return Mono.create(
         emitter -> {
           webSocketEventBus.subscribeOnConnection(
               event -> {
-                if (CONNECTED.equals(event.getEvent())) emitter.next(event.getMessage());
+                if (CONNECTED.equals(event.getEvent())) emitter.success(true);
                 if (DISCONNECTED.equals(event.getEvent())) reconnect();
               });
         });

@@ -1,7 +1,5 @@
 package com.bux.bot.basic_trading_bot.event.global;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 
 public class GlobalEvent<T> {

@@ -1,8 +1,9 @@
 package com.bux.bot.basic_trading_bot.event.global;
 
-import com.sun.istack.NotNull;
+
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 

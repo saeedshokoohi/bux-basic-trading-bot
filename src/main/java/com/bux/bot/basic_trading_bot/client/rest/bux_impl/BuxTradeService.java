@@ -1,14 +1,12 @@
 package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
+import com.bux.bot.basic_trading_bot.client.rest.TradeService;
 import com.bux.bot.basic_trading_bot.dto.ClosePositionResponse;
 import com.bux.bot.basic_trading_bot.dto.InvestingAmount;
 import com.bux.bot.basic_trading_bot.dto.OpenPositionRequest;
 import com.bux.bot.basic_trading_bot.dto.OpenPositionResponse;
 import com.bux.bot.basic_trading_bot.dto.enums.PositionDirection;
-import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
-import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
-import com.bux.bot.basic_trading_bot.exception.WebClientApiCallException;
-import com.bux.bot.basic_trading_bot.exception.WebClientInitializationException;
+import com.bux.bot.basic_trading_bot.exception.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -50,12 +48,15 @@ public class BuxTradeService implements TradeService {
       throws WebClientInitializationException, InvalidBrokerConfigurationException,
           InvalidBodyRequestException {
     if (buxWebClientFactory == null)
-      throw new WebClientInitializationException("buxWebClient could not be initialized");
+      throw new WebClientInitializationException(Messages.BUX_WEB_CLIENT_COULD_NOT_BE_INITIALIZED);
     OpenPositionRequest openPositionRequest =
         createOpenPositionRequest(
             PositionDirection.BUY, productId, amount, leverage, decimals, currency);
+    //validating request
     validateOpenPositionRequest(openPositionRequest);
     String uri = "/users/me/trades";
+
+    //calling post api
     return buxWebClientFactory
         .getWebClient()
         .post()
@@ -70,18 +71,18 @@ public class BuxTradeService implements TradeService {
   public Mono<ClosePositionResponse> closePosition(@NotNull String positionId)
       throws WebClientInitializationException, InvalidBrokerConfigurationException {
     if (buxWebClientFactory == null)
-      throw new WebClientInitializationException("buxWebClient could not be initialized");
+      throw new WebClientInitializationException(Messages.BUX_WEB_CLIENT_COULD_NOT_BE_INITIALIZED);
     String uri = "/users/me/portfolio/positions/" + positionId;
     return buxWebClientFactory
         .getWebClient()
-            .method(HttpMethod.DELETE)
-
+        .method(HttpMethod.DELETE)
         .uri(uri)
         .exchange()
-            .flatMap(response -> {
-             return response.bodyToMono(ClosePositionResponse.class);
+        .flatMap(
+            response -> {
+              return response.bodyToMono(ClosePositionResponse.class);
             });
-//        .onStatus(HttpStatus::isError, this::handleError)
+    //        .onStatus(HttpStatus::isError, this::handleError)
 
   }
   /***

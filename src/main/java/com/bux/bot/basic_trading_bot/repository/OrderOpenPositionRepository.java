@@ -5,6 +5,4 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderOpenPositionRepository extends CrudRepository<OrderOpenPosition, Long> {
-
-}
+public interface OrderOpenPositionRepository extends CrudRepository<OrderOpenPosition, Long> {}

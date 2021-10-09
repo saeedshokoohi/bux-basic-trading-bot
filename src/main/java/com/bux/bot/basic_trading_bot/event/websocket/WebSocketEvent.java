@@ -7,25 +7,6 @@ public class WebSocketEvent {
   private WebSocketEventMessage message;
   private boolean isEmitted = false;
 
-  public boolean isEmitted() {
-    return isEmitted;
-  }
-
-  public void setEmitted(boolean emitted) {
-    isEmitted = emitted;
-  }
-
-  public WebSocketEventMessage getMessage() {
-    return message;
-  }
-
-  public WebSocketStatusEventType getEvent() {
-    return event;
-  }
-
-  private WebSocketEvent(WebSocketStatusEventType event) {
-    this.event = event;
-  }
 
   public WebSocketEvent(WebSocketStatusEventType event, WebSocketEventMessage message) {
     this.event = event;
@@ -46,5 +27,21 @@ public class WebSocketEvent {
 
   public static WebSocketEvent createOutputMessageEvent(WebSocketEventMessage message) {
     return new WebSocketEvent(WebSocketStatusEventType.OUT_MESSAGE, message);
+  }
+
+  public boolean isEmitted() {
+    return isEmitted;
+  }
+
+  public void setEmitted(boolean emitted) {
+    isEmitted = emitted;
+  }
+
+  public WebSocketEventMessage getMessage() {
+    return message;
+  }
+
+  public WebSocketStatusEventType getEvent() {
+    return event;
   }
 }

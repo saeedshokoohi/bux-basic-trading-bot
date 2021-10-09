@@ -2,6 +2,7 @@ package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
 import com.bux.bot.basic_trading_bot.config.BrokersConfiguration;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
+import com.bux.bot.basic_trading_bot.exception.Messages;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -15,6 +16,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
+/***
+ * this bean is responsible for providing web client base on configuration file
+ */
 @Component
 public class BuxWebClientFactory {
     final BrokersConfiguration brokersConfiguration;
@@ -27,6 +31,12 @@ public class BuxWebClientFactory {
 
     }
 
+    /***
+     * default constructor
+     * it creates or use available webclient
+     * @return
+     * @throws InvalidBrokerConfigurationException
+     */
     public WebClient getWebClient() throws InvalidBrokerConfigurationException {
         if(webClient==null)
         {
@@ -35,7 +45,12 @@ public class BuxWebClientFactory {
         }
         return webClient;
     }
-    public WebClient buxWebClient() {
+
+    /***
+     *  building webClient based on bux restful configuration
+     * @return
+     */
+    private WebClient buxWebClient() {
 
         var tcpClient = TcpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2_000)
@@ -52,13 +67,18 @@ public class BuxWebClientFactory {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken)
                 .build();
     }
+
+    /***
+     * this method validate and extracts configuration to be used in webclient initializing
+     * @throws InvalidBrokerConfigurationException
+     */
     private void initFromConfiguration() throws InvalidBrokerConfigurationException {
         //handling exception
-        if(brokersConfiguration==null )throw new InvalidBrokerConfigurationException("broker configuration not set");
-        if(brokersConfiguration.getBux()==null)throw new InvalidBrokerConfigurationException("broker.bux configuration not set");
-        if(brokersConfiguration.getBux().getRest()==null)throw new InvalidBrokerConfigurationException("broker.bux.rest configuration not set");
-        if(brokersConfiguration.getBux().getRest().getBaseUrl()==null)throw new InvalidBrokerConfigurationException("broker.bux.rest.baseUrl configuration not set");
-        if(brokersConfiguration.getBux().getRest().getAccessToken()==null)throw new InvalidBrokerConfigurationException("broker.bux.rest.accessToken configuration not set");
+        if(brokersConfiguration==null )throw new InvalidBrokerConfigurationException(Messages.BROKER_CONFIGURATION_NOT_SET);
+        if(brokersConfiguration.getBux()==null)throw new InvalidBrokerConfigurationException(Messages.BROKER_BUX_CONFIGURATION_NOT_SET);
+        if(brokersConfiguration.getBux().getRest()==null)throw new InvalidBrokerConfigurationException(Messages.BROKER_BUX_REST_CONFIGURATION_NOT_SET);
+        if(brokersConfiguration.getBux().getRest().getBaseUrl()==null)throw new InvalidBrokerConfigurationException(Messages.BROKER_BUX_REST_BASE_URL_CONFIGURATION_NOT_SET);
+        if(brokersConfiguration.getBux().getRest().getAccessToken()==null)throw new InvalidBrokerConfigurationException(Messages.BROKER_BUX_REST_ACCESS_TOKEN_CONFIGURATION_NOT_SET);
         //setting variables
         String version=brokersConfiguration.getBux().getRest().getVersion();
         String env=brokersConfiguration.getBux().getRest().getEnv();

@@ -1,8 +1,8 @@
 package com.bux.bot.basic_trading_bot.event.websocket;
 
-import com.sun.istack.NotNull;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,10 +14,9 @@ public class WebSocketEventBus {
   private Set<WebSocketEventObserver> connectionChannelObservers;
 
   public WebSocketEventBus() {
-    inputChannelObservers =new HashSet<>();
-    outputChannelObservers =new HashSet<>();
-    connectionChannelObservers =new HashSet<>();
-
+    inputChannelObservers = new HashSet<>();
+    outputChannelObservers = new HashSet<>();
+    connectionChannelObservers = new HashSet<>();
   }
 
   public Set<WebSocketEventObserver> getInputChannelObservers() {
@@ -39,9 +38,11 @@ public class WebSocketEventBus {
   public boolean subscribeOnInput(@NotNull WebSocketEventObserver observer) {
     return inputChannelObservers.add(observer);
   }
+
   public boolean subscribeOnConnection(@NotNull WebSocketEventObserver observer) {
     return connectionChannelObservers.add(observer);
   }
+
   public boolean subscribeOnOutput(@NotNull WebSocketEventObserver observer) {
     return outputChannelObservers.add(observer);
   }
@@ -53,9 +54,11 @@ public class WebSocketEventBus {
   public void emitToInput(WebSocketEvent event) {
     inputChannelObservers.forEach(observer -> observer.next(event));
   }
+
   public void emitToOutput(WebSocketEvent event) {
     outputChannelObservers.forEach(observer -> observer.next(event));
   }
+
   public void emitToConnection(WebSocketEvent event) {
     connectionChannelObservers.forEach(observer -> observer.next(event));
   }
@@ -70,11 +73,9 @@ public class WebSocketEventBus {
     boolean unSubscribed = false;
     if (this.inputChannelObservers != null) {
       unSubscribed = this.inputChannelObservers.remove(observer);
-    }else if(!unSubscribed && this.outputChannelObservers !=null)
-    {
+    } else if (this.outputChannelObservers != null) {
       unSubscribed = this.outputChannelObservers.remove(observer);
-    }else if(!unSubscribed && this.connectionChannelObservers !=null)
-    {
+    } else if (this.connectionChannelObservers != null) {
       unSubscribed = this.connectionChannelObservers.remove(observer);
     }
     return unSubscribed;

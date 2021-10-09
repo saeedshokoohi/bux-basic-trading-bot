@@ -1,4 +1,4 @@
-package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
+package com.bux.bot.basic_trading_bot.client.rest;
 
 import com.bux.bot.basic_trading_bot.dto.ClosePositionResponse;
 import com.bux.bot.basic_trading_bot.dto.OpenPositionResponse;
