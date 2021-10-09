@@ -31,3 +31,33 @@ In the diagram below, the following states and transitions are illustrated:
 
 
 ![Trade State Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/75e017ed0edab8893878d3f2552b9a7c2d48ab4e/design/images/Trading%20State%20Diagram.jpg)
+
+
+## Entity Relationship Diagram
+One main entity in the project data model is "*BotOrderInfo*," while the other two detail entities are "*OrderOpenPosition*" and "*OrderClosePosition*.".
+
+- **BotOrderInfo**: contains all of the information needed by the bot engine to decide whether to open and close a position.
+
+- **OrdOpenPosition**: Upon opening a position, the position details are recorded in the following entity.
+
+- **OrderClosePosition**: The information about a closed position is stored in the entity OrderClosePosition.
+
+
+The following diagram illustrates the fields and relations of the entities:
+
+![Entity Relationship Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/67eeb7ea4ee087283210d928bef5967b82a5ff4b/design/images/entity_relationship_diagram.png)
+
+## Implementation Architecture
+
+**RESTful API:** Allows end-users to add, modify, and retrieve BotOrderInfo data through a RESTful API endpoint.
+
+**BotOrderService:** This package manages the storage and retrieval of data from the database. Also, when any action is taken against the current state, send the event to the global bus.
+
+**BotEngineService:** Retrieves candidate bot orders and listens to the price stream from the TrackerService. After checking the bot trade logic, the bot decides whether to open a position, close a position, or just wait for the proper buy price.
+
+**ClientServices:** The client service package contains two main services: one for tracking the price and another for trading. The TrackerService tracks the price and the TraderService performs trades. These two services are abstract and may have multiple implementations mapped to multiple brokers. 
+
+**EventBus:** As its name suggests, this package handles events from various layers that facilitate loose coupling between services. To ensure ease of implementation and separation of responsibilities, the WebSocket event bus is considered separately.
+
+The following diagram illustrates the implementation layers and their communications :
+
