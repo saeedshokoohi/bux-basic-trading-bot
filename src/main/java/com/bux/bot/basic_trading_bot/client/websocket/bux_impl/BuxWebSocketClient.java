@@ -15,11 +15,11 @@ import java.net.URI;
 
 @Service
 public class BuxWebSocketClient {
+  Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
 
 
   private final BuxWebSocketHandler buxWebSocketHandler;
   private final BrokersConfiguration brokersConfiguration;
-  Logger logger = LoggerFactory.getLogger(BuxWebSocketClient.class);
   private String baseUrl;
   private String channelUrl;
   private String accessToken;

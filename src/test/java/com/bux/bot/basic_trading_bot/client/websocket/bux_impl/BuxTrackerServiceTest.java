@@ -4,6 +4,7 @@ import com.bux.bot.basic_trading_bot.dto.WebSocketEventMessage;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEvent;
 import com.bux.bot.basic_trading_bot.event.websocket.WebSocketEventBus;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {BuxTrackerService.class, BuxWebSocketClient.class, WebSocketEventBus.class})
@@ -54,8 +56,11 @@ class BuxTrackerServiceTest {
                 thenReturn(Mono.error(new Exception()));
 
         //when
-        Mono<Boolean> result = this.buxTrackerService.connect();
-         result.subscribe();
+        AtomicBoolean connected= new AtomicBoolean(false);
+       this.buxTrackerService.connect().subscribe(e->{
+           connected.set(e);
+       });
+
         Thread.sleep(5000);
 
         this.webSocketEventBus.emitToConnection(WebSocketEvent.createConnectedEvent(new WebSocketEventMessage("")));
@@ -63,8 +68,9 @@ class BuxTrackerServiceTest {
 
         //then
         verify(this.buxWebSocketClient).getConnection();
+        assertTrue(connected.get());
 
-        StepVerifier.create(result).expectNext(true);
+
     }
 
     @Test

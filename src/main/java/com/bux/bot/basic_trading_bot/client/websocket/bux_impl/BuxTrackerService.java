@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -47,7 +46,23 @@ public class BuxTrackerService implements TrackerService {
 
   @Override
   public Mono<Boolean> connect() {
-    buxWebSocketClient
+   return Mono.create(emitter->{
+
+                webSocketEventBus.subscribeOnConnection(
+                        event -> {
+                          if (CONNECTED.equals(event.getEvent())) emitter.success(true);
+                        });
+
+      buxWebSocketClient
+              .getConnection()
+              .doOnError(
+                      e -> {
+                        webSocketEventBus.emitToConnection(WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
+                      })
+              .subscribe();
+
+    });
+    /*buxWebSocketClient
         .getConnection()
         .doOnError(
             e -> {
@@ -63,7 +78,7 @@ public class BuxTrackerService implements TrackerService {
                 if (CONNECTED.equals(event.getEvent())) emitter.success(true);
                 if (DISCONNECTED.equals(event.getEvent())) reconnect();
               });
-        });
+        });*/
   }
 
   @Override
@@ -148,11 +163,17 @@ public class BuxTrackerService implements TrackerService {
     //todo: checking some policies for reconnecting
     //todo : temporary we wait for some miliseconds and will try again
     try {
-      Thread.sleep(500);
+      Thread.sleep(2000);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    this.connect();
+    buxWebSocketClient
+            .getConnection()
+            .doOnError(
+                    e -> {
+                      webSocketEventBus.emitToConnection(WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
+                    })
+            .subscribe();
   }
 
   private void emit(WebSocketEvent event) {
@@ -187,10 +208,12 @@ public class BuxTrackerService implements TrackerService {
   }
 
   private void doOnDisconnectEvent() {
+    this.reconnect();
     this.subscribedEvents.forEach(e -> e.setEmitted(false));
   }
 
   private void doOnReconnect() {
+
     System.out.println("Reconnected to websocket");
     reSubscribeEvents();
   }
