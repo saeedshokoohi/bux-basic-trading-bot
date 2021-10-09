@@ -33,7 +33,7 @@ In the diagram below, the following states and transitions are illustrated:
 ![Trade State Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/75e017ed0edab8893878d3f2552b9a7c2d48ab4e/design/images/Trading%20State%20Diagram.jpg)
 
 
-## Entity Realtionship Diagram
+## Entity Relationship Diagram
 One main entity in the project data model is "*BotOrderInfo*," while the other two detail entities are "*OrderOpenPosition*" and "*OrderClosePosition*.".
 
 - **BotOrderInfo**: contains all of the information needed by the bot engine to decide whether to open and close a position.
