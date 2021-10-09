@@ -67,3 +67,20 @@ The following diagram illustrates the implementation layers and their communicat
 
 
 # Implemetation
+
+## Project Structure
+
+The project is a standalone spring-boot application, with the following five main packages in the source project:
+
+![Project Structure Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/429e9ece4947c2410dd813b24263ed32b1653ed6/design/images/project_structure_diagram.png)
+
+- **web**: Developed classes for managing web resources. 
+- **service**: Integrated business logic service classes.
+- **repository**: Including classes for data accessing the repository.
+- **client**: implemented communications with third-party web servers. This includes rest-based communications and WebSocket services.
+- **event**: Class that handles application-level events.
+- **dto**: Data Transfer Object classes that are used to transfer data between web and client-side applications.
+- **exception**: consists of several types of exceptions.
+- **config**: Contains classes that hold configuration-related objects.
+
+
