@@ -10,6 +10,7 @@ This project is a basic trading bot that is implemented for the BUX assignment.
 - Run a sell-order through the REST API service when the price is equal to or higher than the defined upper-sell-price (take-profit) or equal to or lower than the defined lower-sell-price (stop-loss).
 
 
+# Design
 
 ## State Diagram
 
@@ -65,3 +66,4 @@ The following diagram illustrates the implementation layers and their communicat
 ![Implementation Architecture Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/13e00cc71d737e102b563e9612b8b10acc9f5813/design/images/implementation_architecture_diagram.png)
 
 
+# Implemetation
