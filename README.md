@@ -61,3 +61,7 @@ The following diagram illustrates the fields and relations of the entities:
 
 The following diagram illustrates the implementation layers and their communications :
 
+
+![Implementation Architecture Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/13e00cc71d737e102b563e9612b8b10acc9f5813/design/images/implementation_architecture_diagram.png)
+
+
