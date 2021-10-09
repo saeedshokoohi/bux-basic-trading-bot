@@ -42,9 +42,13 @@ public class BotOrderInfo {
     private int leverage=2;
     @Column
     private int decimals=2;
+
+    @Column
+    private long createDate;
     @Column
     private String currency="BUX";
     @Transient
+
     private boolean isProcessing=false;
 
     //todo : fetch type must be lazy
@@ -210,5 +214,13 @@ public class BotOrderInfo {
 
     public void setProcessing(boolean processing) {
         isProcessing = processing;
+    }
+
+    public long getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(long createDate) {
+        this.createDate = createDate;
     }
 }
