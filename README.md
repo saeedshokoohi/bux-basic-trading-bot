@@ -137,7 +137,7 @@ Currently, three main API has been developed :
 - authentication and authorization.
 - detailed documentation for API (swagger is a good option)
 
-## Build /Run
+# Build /Run
 Since Maven is an integrated build tool, it is possible to build and test code within it.
 The application is a spring-boot application using H2 as an embedded database. To run it, just run the following command:
 
