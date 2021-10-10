@@ -75,11 +75,23 @@ The project is a standalone spring-boot application, with the following five mai
 ![Project Structure Diagram](https://github.com/saeedshokoohi/bux-basic-trading-bot/blob/429e9ece4947c2410dd813b24263ed32b1653ed6/design/images/project_structure_diagram.png)
 
 - **web**: Developed classes for managing web resources. 
+The *RestController* has been used to implement the RESTAPI, whose methods return generic types ResponseEntity for additional data processing beyond the basic data. If a request contains a bad validation error, detailed data, including EntityName and target fields, will be returned as a validation error.
+
 - **service**: Integrated business logic service classes.
+For the purpose of providing more performance and addressing real-time issues, reactive programming is seen as the main foundation. Consequently, most methods return Mono and Flux as return types. Application logic for validation and trading are also integrated into this layer. 
 - **repository**: Including classes for data accessing the repository.
+The repository service simply uses spring data *CrudRepository*, for handling current features. Additionally, if a need arises, the upper layer can easily be integrated with the reactive repository which is not implemented in the current state.
+
 - **client**: implemented communications with third-party web servers. This includes rest-based communications and WebSocket services.
+There are two main sections in the client layer. The first is for calling the broker's RESTAPI for performing trades using *WebClient*. The second is for connecting to the websocket server to track price changes using *ReactorNettyWebSocketClient* implementation.
+TraderService and TrackerService are two interfaces implemented in every section. As a consequence, we can modify or replace implementations without affecting other parts of the code.
+
 - **event**: Class that handles application-level events.
+We have a GlobalEventBus that transmits generic GlobalEvents among the application layers. WebSocketEventBus is responsible for handling events related to WebSockets, which eventually emit events to GlobalEventBus to ensure integrity.
+
 - **dto**: Data Transfer Object classes that are used to transfer data between web and client-side applications.
+DTO classes are used for inter-class communications, as well as passing and receiving data to and from third parties from the application. Boilerplate codes are omitted from constructors and accessors via Lombok library. 
+
 - **exception**: consists of several types of exceptions.
 - **config**: Contains classes that hold configuration-related objects.
 
