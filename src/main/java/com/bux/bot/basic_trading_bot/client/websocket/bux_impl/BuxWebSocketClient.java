@@ -37,7 +37,7 @@ public class BuxWebSocketClient {
    * @return
    */
   public Mono<Void> getConnection() {
-
+    reloadConfig();
     String url = String.format("%s%s", baseUrl, channelUrl);
     logger.info("connecting to " + url);
     HttpHeaders headers = new HttpHeaders();
@@ -45,6 +45,14 @@ public class BuxWebSocketClient {
     headers.add("Authorization", "Bearer " + accessToken);
     WebSocketClient client = new ReactorNettyWebSocketClient();
     return client.execute(URI.create(url), headers, buxWebSocketHandler);
+  }
+
+  private void reloadConfig() {
+    try {
+      initFromConfiguration();
+    } catch (InvalidBrokerConfigurationException e) {
+      logger.error("websocket config error",e);
+    }
   }
 
   /***

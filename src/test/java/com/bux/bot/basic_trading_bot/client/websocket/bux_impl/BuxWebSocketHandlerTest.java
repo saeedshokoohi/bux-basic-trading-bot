@@ -44,8 +44,8 @@ class BuxWebSocketHandlerTest {
     WebSocketMessage inputMessage2 = mock(WebSocketMessage.class);
     inputMessages.add(inputMessage1);
     inputMessages.add(inputMessage2);
-    when(inputMessage1.getPayloadAsText()).thenReturn(MockData.INPUT_MESSAGE1);
-    when(inputMessage2.getPayloadAsText()).thenReturn(MockData.INPUT_MESSAGE2);
+    when(inputMessage1.getPayloadAsText()).thenReturn(WebSocketMockData.INPUT_MESSAGE1);
+    when(inputMessage2.getPayloadAsText()).thenReturn(WebSocketMockData.INPUT_MESSAGE2);
     when(session.receive()).thenReturn(Flux.fromIterable(inputMessages));
 
     when(session.send(any()))
@@ -75,11 +75,11 @@ class BuxWebSocketHandlerTest {
     outputMessagesList.add(
         new WebSocketEvent(
             WebSocketStatusEventType.OUT_MESSAGE,
-            new WebSocketEventMessage(MockData.SUBSCRIBE_TO_MESSAGE_1)));
+            new WebSocketEventMessage(WebSocketMockData.SUBSCRIBE_TO_MESSAGE_1)));
     outputMessagesList.add(
         new WebSocketEvent(
             WebSocketStatusEventType.OUT_MESSAGE,
-            new WebSocketEventMessage(MockData.SUBSCRIBE_TO_MESSAGE_2)));
+            new WebSocketEventMessage(WebSocketMockData.SUBSCRIBE_TO_MESSAGE_2)));
     Flux<WebSocketEvent> outputMessages = Flux.fromIterable(outputMessagesList);
     WebSocketSession session = mock(WebSocketSession.class);
     WebSocketMessage mockWebSocketMessage = mock(WebSocketMessage.class);

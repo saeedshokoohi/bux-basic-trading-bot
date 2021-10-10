@@ -128,7 +128,8 @@ public class BotOrderInfoService {
     } catch (EntityValidationException e) {
       return Mono.error(e);
     }
-    return Mono.just(botOrderInfoRepository.save(botOrderInfo));
+    botOrderInfo=botOrderInfoRepository.save(botOrderInfo);
+    return Mono.just(botOrderInfo);
   }
 
   /***

@@ -1,6 +1,6 @@
 package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
-public class MockData {
+public class TraderServerMockData {
   public static final String OPEN_POSITION_REQUEST =
       "{\n"
           + " \"productId\" : \"26618\",\n"
@@ -81,4 +81,62 @@ public class MockData {
           + " \"developerMessage\": \"technical description of the error\",\n"
           + " \"errorCode\": \"AUTH_001\"\n"
           + "}";
+  public static final String SUCCESSFUL_OPEN_POSITION_RESPONSE_productp32112 =
+          "{\n" +
+                  " \"id\": \"f2a673d9-a457-4ab6-8c84-8ec81ed0c7ab\",\n" +
+                  " \"positionId\": \"655ddda5-fd6d-48a9-800d-b7b93eb041af\",\n" +
+                  " \"profitAndLoss\": {\n" +
+                  " \"currency\": \"BUX\",\n" +
+                  " \"decimals\": 2,\n" +
+                  " \"amount\": \"-0.71\"\n" +
+                  " },\n" +
+                  " \"product\": {\n" +
+                  " \"securityId\": \"p32112\",\n" +
+                  " \"symbol\": \"IM.AS\",\n" +
+                  " \"displayName\": \"IMTECH\"\n" +
+                  " },\n" +
+                  " \"investingAmount\": {\n" +
+                  " \"currency\": \"BUX\",\n" +
+                  " \"decimals\": 2,\n" +
+                  " \"amount\": \"200.00\"\n" +
+                  " },\n" +
+                  " \"price\": {\n" +
+                  " \"currency\": \"EUR\",\n" +
+                  " \"decimals\": 3,\n" +
+                  " \"amount\": \"0.565\"\n" +
+                  " },\n" +
+                  " \"leverage\": 1,\n" +
+                  " \"direction\": \"SELL\",\n" +
+                  " \"type\": \"CLOSE\",\n" +
+                  " \"dateCreated\": 1405515554326\n" +
+                  "}\n";
+  public static final String SUCCESSFUL_CLOSE_POSITION_RESPONSE_productp32112 =
+          "{\n" +
+                  " \"id\": \"f2a673d9-a457-4ab6-8c84-8ec81ed0c7ab\",\n" +
+                  " \"positionId\": \"4c58a0b2-ea78-46a0-ac21-5a8c22d527dc\",\n" +
+                  " \"profitAndLoss\": {\n" +
+                  " \"currency\": \"BUX\",\n" +
+                  " \"decimals\": 2,\n" +
+                  " \"amount\": \"-0.71\"\n" +
+                  " },\n" +
+                  " \"product\": {\n" +
+                  " \"securityId\": \"p32112\",\n" +
+                  " \"symbol\": \"IM.AS\",\n" +
+                  " \"displayName\": \"IMTECH\"\n" +
+                  " },\n" +
+                  " \"investingAmount\": {\n" +
+                  " \"currency\": \"BUX\",\n" +
+                  " \"decimals\": 2,\n" +
+                  " \"amount\": \"200.00\"\n" +
+                  " },\n" +
+                  " \"price\": {\n" +
+                  " \"currency\": \"EUR\",\n" +
+                  " \"decimals\": 3,\n" +
+                  " \"amount\": \"0.565\"\n" +
+                  " },\n" +
+                  " \"leverage\": 1,\n" +
+                  " \"direction\": \"SELL\",\n" +
+                  " \"type\": \"CLOSE\",\n" +
+                  " \"dateCreated\": 1405515554326\n" +
+                  "}\n";
 }

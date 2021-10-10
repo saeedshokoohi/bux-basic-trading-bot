@@ -16,7 +16,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -62,10 +61,10 @@ class BuxTradeServiceTest {
     // given
 
     OpenPositionRequest openpositionRequest =
-        JsonUtil.jsonToObject(MockData.OPEN_POSITION_REQUEST, OpenPositionRequest.class);
+        JsonUtil.jsonToObject(TraderServerMockData.OPEN_POSITION_REQUEST, OpenPositionRequest.class);
     OpenPositionResponse openPositionResponse =
         JsonUtil.jsonToObject(
-            MockData.SUCCESSFUL_OPEN_POSITION_RESPONSE, OpenPositionResponse.class);
+            TraderServerMockData.SUCCESSFUL_OPEN_POSITION_RESPONSE, OpenPositionResponse.class);
     String productId = openpositionRequest.getProductId();
     String currency = openpositionRequest.getInvestingAmount().getCurrency();
     int leverage = openpositionRequest.getLeverage();
@@ -95,7 +94,7 @@ class BuxTradeServiceTest {
           InvalidBodyRequestException, JsonProcessingException {
     // given
     String positionId = "4c58a0b2-ea78-46a0-ac21-5a8c22d527dc";
-    String reponseString = MockData.SUCCESSFUL_CLOSE_POSITION_RESPONSE;
+    String reponseString = TraderServerMockData.SUCCESSFUL_CLOSE_POSITION_RESPONSE;
     ClosePositionResponse closePositionResponse =
         JsonUtil.jsonToObject(reponseString, ClosePositionResponse.class);
     // adding expected response to mockBackEnd
@@ -120,7 +119,7 @@ class BuxTradeServiceTest {
           JsonProcessingException {
     // given
     String positionId = "4c58a0b2-ea78-46a0-ac21-5a8c22d527dc";
-    String reponseString = MockData.FAILED_CLOSE_POSITION_RESPONSE;
+    String reponseString = TraderServerMockData.FAILED_CLOSE_POSITION_RESPONSE;
     ErrorResponse closePositionResponse = JsonUtil.jsonToObject(reponseString, ErrorResponse.class);
     WebClientApiCallException expectedException = new WebClientApiCallException(reponseString);
     // adding expected response to mockBackEnd

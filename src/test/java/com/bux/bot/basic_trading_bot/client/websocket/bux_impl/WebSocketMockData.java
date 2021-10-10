@@ -1,6 +1,6 @@
 package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
-public class MockData {
+public class WebSocketMockData {
   public static final String SUBSCRIBE_TO_MESSAGE_1 =
       "\"subscribeTo\": [\n" + " \"trading.product.2223\"\n" + " ],\n";
     public static final String SUBSCRIBE_TO_MESSAGE_2 =
@@ -28,4 +28,28 @@ public class MockData {
             " }\n" +
             " }\n" +
             "}\n";
+  public static final String INPUT_MESSAGE_productp32112 =
+          "{\n"
+                  + " \"t\": \"trading.quote\",\n"
+                  + " \"body\": {\n"
+                  + " \"securityId\": \"p32112\",\n"
+                  + " \"currentPrice\": \"105\"\n"
+                  + " }\n"
+                  + "}\n";
+  public static final String INPUT_MESSAGE_productp32112_goodPrice_tobuy =
+          "{\n"
+                  + " \"t\": \"trading.quote\",\n"
+                  + " \"body\": {\n"
+                  + " \"securityId\": \"p32112\",\n"
+                  + " \"currentPrice\": \"100\"\n"
+                  + " }\n"
+                  + "}\n";
+  public static final String INPUT_MESSAGE_productp32112_goodPrice_tosellWithProfit =
+          "{\n"
+                  + " \"t\": \"trading.quote\",\n"
+                  + " \"body\": {\n"
+                  + " \"securityId\": \"p32112\",\n"
+                  + " \"currentPrice\": \"120\"\n"
+                  + " }\n"
+                  + "}\n";
 }
