@@ -100,7 +100,7 @@ Structured configuration classes that are mapped to *.yml application properties
 During configuration, we provide a special configuration parameter called *BrokerConfiguration*, which supports multiple broker configurations. It is further separated into *WebSocket* configuration and *Rest* configuration.
 
 # Testing
-- Tests have been conducted using** Junit 5**, the main API for testing. A large part of assertions is also handled by **assertj** library.
+- Tests have been conducted using **Junit 5**, the main API for testing. A large part of assertions is also handled by **assertj** library.
 
 - **okhttp3 mockServer** is used to mock the backend servers (rest and websocket) when testing client service classes.
 
