@@ -93,6 +93,10 @@ We have a GlobalEventBus that transmits generic GlobalEvents among the applicati
 DTO classes are used for inter-class communications, as well as passing and receiving data to and from third parties from the application. Boilerplate codes are omitted from constructors and accessors via Lombok library. 
 
 - **exception**: consists of several types of exceptions.
+Exceptions of all kinds are gathered in this package to throw meaningful exceptions. Additionally, EntityValidationExceptions extend exceptions by adding more specified data for error handling at any level of validation.
+
 - **config**: Contains classes that hold configuration-related objects.
+Structured configuration classes that are mapped to *.yml application properties.
+During configuration, we provide a special configuration parameter called *BrokerConfiguration*, which supports multiple broker configurations. It is further separated into *WebSocket* configuration and *Rest* configuration.
 
 
