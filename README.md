@@ -99,4 +99,15 @@ Exceptions of all kinds are gathered in this package to throw meaningful excepti
 Structured configuration classes that are mapped to *.yml application properties.
 During configuration, we provide a special configuration parameter called *BrokerConfiguration*, which supports multiple broker configurations. It is further separated into *WebSocket* configuration and *Rest* configuration.
 
+# Testing
+- Tests have been conducted using** Junit 5**, the main API for testing. A large part of assertions is also handled by **assertj** library.
+
+- **okhttp3 mockServer** is used to mock the backend servers (rest and websocket) when testing client service classes.
+
+- Testing services and mocking beans are done with **Mokito**, which mocks the beans.
+
+- Tests for restcontrollers are performed with **WebMvcTest**.
+
+- **DataJpaTest** extension benefits repository layer testing, and for integration testing, H2 database in memory mode is being considered. 
+
 
