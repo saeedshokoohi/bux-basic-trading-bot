@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix="brokers" , ignoreInvalidFields = false)
 @Data
-@NoArgsConstructor
+    @NoArgsConstructor
 public class BrokersConfiguration {
     private BrokerConfiguration bux;
 }

@@ -24,18 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType.CONNECTED;
-import static com.bux.bot.basic_trading_bot.event.websocket.WebSocketStatusEventType.DISCONNECTED;
 
 @Service
 public class BuxTrackerService implements TrackerService {
-  Logger logger = LoggerFactory.getLogger(StartupService.class);
   private final BuxWebSocketClient buxWebSocketClient;
   private final WebSocketEventBus webSocketEventBus;
-
+  Logger logger = LoggerFactory.getLogger(StartupService.class);
   //
-  private ConcurrentMap<String,Integer> productSubscribeCount=new ConcurrentHashMap<>();
+  private ConcurrentMap<String, Integer> productSubscribeCount = new ConcurrentHashMap<>();
   private List<WebSocketEvent> subscribedEvents = Collections.synchronizedList(new ArrayList<>());
-
 
   public BuxTrackerService(
       WebSocketEventBus webSocketEventBus, BuxWebSocketClient buxWebSocketClient) {
@@ -46,68 +43,56 @@ public class BuxTrackerService implements TrackerService {
 
   @Override
   public Mono<Boolean> connect() {
-   return Mono.create(emitter->{
-
-                webSocketEventBus.subscribeOnConnection(
-                        event -> {
-                          if (CONNECTED.equals(event.getEvent())) emitter.success(true);
-                        });
-
-      buxWebSocketClient
-              .getConnection()
-              .doOnError(
-                      e -> {
-                        webSocketEventBus.emitToConnection(WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
-                      })
-              .subscribe();
-
-    });
-    /*buxWebSocketClient
-        .getConnection()
-        .doOnError(
-            e -> {
-             logger.error("web socket connection error",e);
-              reconnect();
-            })
-        .subscribe();
-
     return Mono.create(
         emitter -> {
+          // subscribing on connection event to check connection
           webSocketEventBus.subscribeOnConnection(
               event -> {
                 if (CONNECTED.equals(event.getEvent())) emitter.success(true);
-                if (DISCONNECTED.equals(event.getEvent())) reconnect();
               });
-        });*/
+          // asking for connection
+          buxWebSocketClient
+              .getConnection()
+              .doOnError(
+                  e -> {
+                    webSocketEventBus.emitToConnection(
+                        WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
+                  })
+              .subscribe();
+        });
   }
 
   @Override
   public void monitorProductPrice(String productId) {
 
-    if(!productSubscribeCount.containsKey(productId) || productSubscribeCount.get(productId)==0)
-    {
+    if (!productSubscribeCount.containsKey(productId)
+        || productSubscribeCount.get(productId) == 0) {
       WebSocketEventMessage message =
-              new WebSocketEventMessage(
-                      new SubscribeMessage(Constants.TRADING_PRODUCT_PREFIX + productId).toString());
+          new WebSocketEventMessage(
+              new SubscribeMessage(Constants.TRADING_PRODUCT_PREFIX + productId).toString());
       WebSocketEvent event = WebSocketEvent.createOutputMessageEvent(message);
       emit(event);
-      logger.info("monitoring price for productId :"+productId);
+      logger.info("monitoring price for productId :" + productId);
     }
     if (productSubscribeCount.containsKey(productId)) {
       Integer count = productSubscribeCount.get(productId) + 1;
-      productSubscribeCount.replace(productId,count);
+      productSubscribeCount.replace(productId, count);
 
-
-    }else {
+    } else {
       productSubscribeCount.put(productId, 1);
     }
   }
 
   public Flux<ProductPrice> subscribeOnProductPrice(String productId) {
-    return subscribeOnAllProductPrice().doOnNext(price->{
-      logger.info("price update for product id:"+productId+"->"+price.getCurrentPrice());
-    })
-        .filter(productPrice -> productPrice.getSecurityId().equals(productId));
+
+    return Flux.create(
+        emitter -> {
+          subscribeOnAllProductPrice()
+              .subscribe(
+                  productPrice -> {
+                    if (productPrice.getSecurityId().equals(productId)) emitter.next(productPrice);
+                  });
+        });
   }
 
   public Flux<ProductPrice> subscribeOnAllProductPrice() {
@@ -123,17 +108,16 @@ public class BuxTrackerService implements TrackerService {
 
   @Override
   public void unsubscribeOnProductPrice(String productId) {
-    int count =0;
-    if(productSubscribeCount.containsKey(productId))
-    {
-      if(productSubscribeCount.get(productId)>0)
-      {
-        count=count-1;
-        productSubscribeCount.replace(productId,count);
+    int count = 0;
+    if (productSubscribeCount.containsKey(productId)) {
+      if (productSubscribeCount.get(productId) > 0) {
+
+        count = productSubscribeCount.get(productId) - 1;
+        productSubscribeCount.replace(productId, count);
       }
     }
     if (count == 0) {
-      logger.info("unsubscribing on product :"+ productId);
+      logger.info("unsubscribing on product :" + productId);
       WebSocketEventMessage message =
           new WebSocketEventMessage(
               new UnSubscribeMessage(Constants.TRADING_PRODUCT_PREFIX + productId).toString());
@@ -147,8 +131,8 @@ public class BuxTrackerService implements TrackerService {
     ProductPrice productPrice = null;
     String eventMessage = e.getMessage().getContent();
     String type = JsonUtil.getFieldValue(eventMessage, Constants.TYPE);
-    JsonNode body = JsonUtil.getFieldValueAsJsonNode(eventMessage,Constants.BODY);
-    if (type!=null && Constants.TRADING_QUOTE.equals(type) && body != null) {
+    JsonNode body = JsonUtil.getFieldValueAsJsonNode(eventMessage, Constants.BODY);
+    if (type != null && Constants.TRADING_QUOTE.equals(type) && body != null) {
       try {
         productPrice = JsonUtil.jsonToObject(body.toString(), ProductPrice.class);
       } catch (JsonProcessingException ex) {
@@ -158,22 +142,20 @@ public class BuxTrackerService implements TrackerService {
     return productPrice;
   }
 
-  public void reconnect() {
+  public ConcurrentMap<String, Integer> getProductSubscribeCount() {
+    return productSubscribeCount;
+  }
+
+  private void reconnect() {
     logger.info("reconnecting to web socket server.....");
-    //todo: checking some policies for reconnecting
-    //todo : temporary we wait for some miliseconds and will try again
+    // todo: checking some policies for reconnecting
+    // todo : temporary we wait for some miliseconds and will try again
     try {
       Thread.sleep(2000);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    buxWebSocketClient
-            .getConnection()
-            .doOnError(
-                    e -> {
-                      webSocketEventBus.emitToConnection(WebSocketEvent.createDisconnectedEvent(new WebSocketEventMessage("")));
-                    })
-            .subscribe();
+    buxWebSocketClient.getConnection().subscribe();
   }
 
   private void emit(WebSocketEvent event) {
@@ -213,8 +195,6 @@ public class BuxTrackerService implements TrackerService {
   }
 
   private void doOnReconnect() {
-
-    System.out.println("Reconnected to websocket");
     reSubscribeEvents();
   }
 }

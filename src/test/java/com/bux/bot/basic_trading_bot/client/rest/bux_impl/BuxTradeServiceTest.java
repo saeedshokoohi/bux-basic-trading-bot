@@ -1,6 +1,8 @@
 package com.bux.bot.basic_trading_bot.client.rest.bux_impl;
 
+import com.bux.bot.basic_trading_bot.config.BrokerConfiguration;
 import com.bux.bot.basic_trading_bot.config.BrokersConfiguration;
+import com.bux.bot.basic_trading_bot.config.RestConfiguration;
 import com.bux.bot.basic_trading_bot.dto.*;
 import com.bux.bot.basic_trading_bot.exception.InvalidBodyRequestException;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
@@ -15,8 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -26,15 +27,15 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-@EnableConfigurationProperties(value = BrokersConfiguration.class)
 @ContextConfiguration(classes = {BrokersConfiguration.class})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
 class BuxTradeServiceTest {
 
   MockWebServer mockBackEnd;
-  @Autowired BrokersConfiguration brokersConfiguration;
+  @MockBean
+  BrokersConfiguration brokersConfiguration;
 
   BuxTradeService buxTradeService;
 
@@ -43,6 +44,7 @@ class BuxTradeServiceTest {
     mockBackEnd = new MockWebServer();
     mockBackEnd.start();
     String baseUrl = String.format("http://localhost:%s", mockBackEnd.getPort());
+    when(this.brokersConfiguration.getBux()).thenReturn(new BrokerConfiguration(null,new RestConfiguration("baseurl","channel","saf","3","3")));
     this.brokersConfiguration.getBux().getRest().setBaseUrl(baseUrl);
     BuxWebClientFactory buxWebClientFactory = new BuxWebClientFactory(this.brokersConfiguration);
     buxTradeService = new BuxTradeService(buxWebClientFactory);

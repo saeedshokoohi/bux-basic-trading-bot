@@ -102,13 +102,14 @@ public class BotEngineService {
             "checking price to OPEN a POSITION for botOrder : %d on product: %s",
             botOrder.getId(), botOrder.getProductId()));
     Double buyPrice = botOrder.getBuyPrice();
+    Double lowerSellPrice=botOrder.getLowerSellPrice();
     Double currentPrice = null;
     try {
       currentPrice = Double.parseDouble(productPrice.getCurrentPrice());
     } catch (NumberFormatException ex) {
       ex.printStackTrace();
     }
-    if (buyPrice >= currentPrice) {
+    if (buyPrice >= currentPrice && lowerSellPrice< currentPrice) {
       return openPosition(botOrder);
     } else {
       //todo: logger info are added by intend but in real project must be removed for performance issues

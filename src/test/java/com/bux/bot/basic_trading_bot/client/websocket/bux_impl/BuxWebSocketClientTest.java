@@ -2,7 +2,10 @@ package com.bux.bot.basic_trading_bot.client.websocket.bux_impl;
 
 import com.bux.bot.basic_trading_bot.client.rest.bux_impl.BuxTradeService;
 import com.bux.bot.basic_trading_bot.client.rest.bux_impl.BuxWebClientFactory;
+import com.bux.bot.basic_trading_bot.config.BrokerConfiguration;
 import com.bux.bot.basic_trading_bot.config.BrokersConfiguration;
+import com.bux.bot.basic_trading_bot.config.RestConfiguration;
+import com.bux.bot.basic_trading_bot.config.WebSocketConfiguration;
 import com.bux.bot.basic_trading_bot.exception.InvalidBrokerConfigurationException;
 import com.bux.bot.basic_trading_bot.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,13 +34,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@EnableConfigurationProperties(value = BrokersConfiguration.class)
-@ContextConfiguration(classes = {BrokersConfiguration.class})
+
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
 class BuxWebSocketClientTest {
     MockWebServer mockBackEnd;
-    @Autowired BrokersConfiguration brokersConfiguration;
+    @MockBean BrokersConfiguration brokersConfiguration;
     @MockBean
      BuxWebSocketHandler buxWebSocketHandler;
 
@@ -48,6 +49,8 @@ class BuxWebSocketClientTest {
     void initialize() throws InvalidBrokerConfigurationException, IOException {
         mockBackEnd = new MockWebServer();
         mockBackEnd.start();
+        when(this.brokersConfiguration.getBux()).thenReturn(new BrokerConfiguration(new WebSocketConfiguration("baseurl","/channel","saf"),null));
+
         String baseUrl = String.format("http://localhost:%s", mockBackEnd.getPort());
         this.brokersConfiguration.getBux().getWebsocket().setBaseUrl(baseUrl);
         buxWebSocketClient=new BuxWebSocketClient(buxWebSocketHandler, this.brokersConfiguration);
