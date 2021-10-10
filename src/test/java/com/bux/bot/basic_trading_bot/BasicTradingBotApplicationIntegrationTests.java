@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,8 +55,8 @@ class BasicTradingBotApplicationIntegrationTests {
   @AfterEach
   void dispose() throws IOException {
 
-      mockBackRest.shutdown();
-      mockBackWebSocket.shutdown();
+    mockBackRest.shutdown();
+    mockBackWebSocket.shutdown();
   }
 
   @Test
@@ -65,18 +64,17 @@ class BasicTradingBotApplicationIntegrationTests {
     // given
     initWebSocketMockServer();
     initTraderMockServer();
-      List<BotOrderInfo> addedRecords = addSomeSampleRecords();
+    List<BotOrderInfo> addedRecords = addSomeSampleRecords();
     // when
     this.startupService.startTradingBot();
     Thread.sleep(20000);
-      Optional<BotOrderInfo> targetBotOrder = this.botOrderInfoRepository.findById(1l);
+    Optional<BotOrderInfo> targetBotOrder = this.botOrderInfoRepository.findById(1l);
     // then
-      assertThat(targetBotOrder.isPresent()).isTrue().as("bot order created");
-      assertThat(targetBotOrder.get()).matches(bo->bo.getOpenPosition()!=null,"position opened and saved in bot orderInfo");
-      assertThat(targetBotOrder.get()).matches(bo->bo.getClosePosition()!=null,"position closed and saved in bot orderInfo");
-
-
-
+    assertThat(targetBotOrder.isPresent()).isTrue().as("bot order created");
+    assertThat(targetBotOrder.get())
+        .matches(bo -> bo.getOpenPosition() != null, "position opened and saved in bot orderInfo");
+    assertThat(targetBotOrder.get())
+        .matches(bo -> bo.getClosePosition() != null, "position closed and saved in bot orderInfo");
   }
 
   private void initTraderMockServer() {
@@ -87,7 +85,6 @@ class BasicTradingBotApplicationIntegrationTests {
 
     mockBackRest.enqueue(
         new MockResponse()
-
             .setBody(SUCCESSFUL_CLOSE_POSITION_RESPONSE_productp32112)
             .addHeader("Content-Type", "application/json"));
   }
@@ -97,7 +94,7 @@ class BasicTradingBotApplicationIntegrationTests {
     BotOrderInfo botOrder1 = new BotOrderInfo("order1", "p32112", "100", 100.0, 110.0, 95.0);
     BotOrderInfo botOrder2 = new BotOrderInfo("order2", "p8562", "100", 100.0, 110.0, 95.0);
     BotOrderInfo botOrder3 = new BotOrderInfo("order3", "p4857", "100", 100.0, 110.0, 95.0);
-      List<BotOrderInfo> retList=List.of(botOrder1, botOrder2, botOrder3);
+    List<BotOrderInfo> retList = List.of(botOrder1, botOrder2, botOrder3);
     botOrderInfoService.addNewBotOrderInfo(botOrder1).block();
     botOrderInfoService.addNewBotOrderInfo(botOrder2).block();
     botOrderInfoService.addNewBotOrderInfo(botOrder3).block();
@@ -134,10 +131,9 @@ class BasicTradingBotApplicationIntegrationTests {
                     Thread.sleep(3000);
                     // sending good price to sell
                     webSocket.send(INPUT_MESSAGE_productp32112_goodPrice_tosellWithProfit);
-                      webSocket.send(INPUT_MESSAGE_productp32112_goodPrice_tosellWithProfit);
-                      Thread.sleep(3000);
-                      webSocket.close(1,"");
-
+                    webSocket.send(INPUT_MESSAGE_productp32112_goodPrice_tosellWithProfit);
+                    Thread.sleep(3000);
+                    webSocket.close(1, "");
                   }
 
                   @Override
