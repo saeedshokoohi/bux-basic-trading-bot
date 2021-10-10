@@ -110,4 +110,32 @@ During configuration, we provide a special configuration parameter called *Broke
 
 - **DataJpaTest** extension benefits repository layer testing, and for integration testing, H2 database in memory mode is being considered. 
 
+# RestAPIs
+Currently, three main API has been developed :
+- **adding bot order **
+  -  url : {baseurl}/api/bot-order/add
+  -  method: POST
+  -  body sample :
+ {
+  "title": "somtitle",
+  "productId": "sb26513",
+  "buyPrice": "4402",
+  "amount":"50",
+  "upperSellPrice":"4403",
+  "lowerSellPrice":"4400" }
+  
+- **getting a list of current bot orders.**
+  - url: {baseurl}/api/bot-order/list
+  - method: GET
+  
+- **clearing bot orders**
+  - url: {baseurl}/api/bot-order/clear
+  - method: GET-
+  
+>   future developments that are essential for a real application : 
+- more API is needed.
+- authentication and authorization.
+- detailed documentation for API (swagger is a good option)
+
+
 
