@@ -24,12 +24,13 @@ import static com.bux.bot.basic_trading_bot.entity.enums.BotOrderStatus.OPEN;
 
 @Service
 public class StartupService {
-  final ApplicationConfiguration applicationConfiguration;
-  final BotOrderInfoService botOrderInfoService;
-  final TrackerService trackerService;
-  final BotEngineService botEngineService;
-  final GlobalEventBus globalEventBus;
-  Logger logger = LoggerFactory.getLogger(StartupService.class);
+    Logger logger = LoggerFactory.getLogger(StartupService.class);
+
+    final ApplicationConfiguration applicationConfiguration;
+    final BotOrderInfoService botOrderInfoService;
+    final TrackerService trackerService;
+    final BotEngineService botEngineService;
+    final GlobalEventBus globalEventBus;
 
   public StartupService(
       BotOrderInfoService botOrderInfoService,
